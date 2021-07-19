@@ -45,30 +45,24 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    LET = 258,
-    IN = 259,
-    INTEGER = 260,
-    FLOAT = 261,
-    SKIP = 262,
-    IF = 263,
-    THEN = 264,
-    END = 265,
-    READ = 266,
-    WRITE = 267,
-    FI = 268,
-    NUMINT = 269,
-    NUMFLT = 270,
-    IDENTIFIER = 271,
-    BOOLEAN = 272,
-    FUNCTION = 273,
-    CARREGA = 274,
-    TREINAMENTO = 275,
-    PREDICAO = 276,
-    RESULTADO = 277,
-    ACURACIA = 278,
-    DIVISAO = 279,
-    ESCALONAR = 280,
-    ASSGNOP = 281
+    SKIP = 258,
+    IF = 259,
+    THEN = 260,
+    READ = 261,
+    WRITE = 262,
+    FI = 263,
+    NUMINT = 264,
+    NUMFLT = 265,
+    IDENTIFIER = 266,
+    CARREGA = 267,
+    TREINAMENTO = 268,
+    PREDICAO = 269,
+    RESULTADO = 270,
+    ACURACIA = 271,
+    DIVISAO = 272,
+    ESCALONAR = 273,
+    TRANSFORMAR = 274,
+    ASSGNOP = 275
   };
 #endif
 
@@ -83,7 +77,7 @@ union YYSTYPE
 	int   yint;// 1
 	float yflt;
 
-#line 87 "parser.tab.h" /* yacc.c:1909  */
+#line 81 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

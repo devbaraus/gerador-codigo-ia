@@ -1,5 +1,6 @@
 Terminals unused in grammar
 
+   TRANSFORMAR
    '>'
    '<'
    '='
@@ -10,1473 +11,544 @@ Terminals unused in grammar
    '^'
 
 
-Rules useless in parser due to conflicts
-
-   64 inicio_function: %empty
-
-
-State 1 conflicts: 1 shift/reduce, 1 reduce/reduce
-State 8 conflicts: 1 reduce/reduce
-State 76 conflicts: 1 shift/reduce, 1 reduce/reduce
-State 77 conflicts: 1 shift/reduce, 1 reduce/reduce
-State 82 conflicts: 1 shift/reduce, 1 reduce/reduce
-State 102 conflicts: 1 shift/reduce, 1 reduce/reduce
-
-
 Grammar
 
     0 $accept: program $end
 
-    1 $@1: %empty
+    1 program: commands
 
-    2 $@2: %empty
+    2 commands: %empty
+    3         | command ';' commands
 
-    3 program: LET declarations IN $@1 commands $@2 END
+    4 command: SKIP
 
-    4 declaration_function: %empty
-    5                     | INTEGER IDENTIFIER
-    6                     | FLOAT IDENTIFIER
+    5 $@1: %empty
 
-    7 parametros_function: %empty
+    6 $@2: %empty
 
-    8 $@3: %empty
+    7 $@3: %empty
 
-    9 parametros_function: INTEGER IDENTIFIER $@3 id_param_functions
+    8 command: CARREGA $@1 IDENTIFIER $@2 IDENTIFIER $@3
+    9        | ESCALONAR
 
    10 $@4: %empty
 
-   11 parametros_function: FLOAT IDENTIFIER $@4 id_param_functions
+   11 command: DIVISAO $@4 exp
+   12        | TREINAMENTO
+   13        | PREDICAO
+   14        | RESULTADO resultados
+   15        | READ IDENTIFIER
+   16        | WRITE IDENTIFIER
 
-   12 $@5: %empty
+   17 $@5: %empty
 
-   13 parametros_function: BOOLEAN IDENTIFIER $@5 id_param_functions
+   18 command: IDENTIFIER ASSGNOP $@5 exp
 
-   14 id_param_functions: %empty
+   19 $@6: %empty
 
-   15 $@6: %empty
+   20 $@7: %empty
 
-   16 id_param_functions: ',' INTEGER IDENTIFIER $@6 id_param_functions
+   21 $@8: %empty
 
-   17 $@7: %empty
+   22 command: $@6 IF exp $@7 THEN commands FI $@8
 
-   18 id_param_functions: ',' FLOAT IDENTIFIER $@7 id_param_functions
+   23 resultados: ACURACIA
 
-   19 $@8: %empty
+   24 exp: NUMINT
+   25    | NUMFLT
+   26    | IDENTIFIER
 
-   20 id_param_functions: ',' BOOLEAN IDENTIFIER $@8 id_param_functions
+   27 $@9: %empty
 
-   21 declarations: %empty
+   28 $@10: %empty
 
-   22 $@9: %empty
-
-   23 $@10: %empty
-
-   24 $@11: %empty
-
-   25 declarations: INTEGER $@9 id_seq_int IDENTIFIER $@10 ';' $@11 declarations
-
-   26 $@12: %empty
-
-   27 $@13: %empty
-
-   28 $@14: %empty
-
-   29 declarations: FLOAT $@12 id_seq_float IDENTIFIER $@13 ';' $@14 declarations
-
-   30 $@15: %empty
-
-   31 $@16: %empty
-
-   32 $@17: %empty
-
-   33 declarations: CARREGA $@15 id_seq_float IDENTIFIER $@16 ';' $@17 declarations
-   34             | inicio_function id_seq_function
-
-   35 id_seq_int: %empty
-   36           | id_seq_int IDENTIFIER ','
-
-   37 id_seq_float: %empty
-   38             | id_seq_float IDENTIFIER ','
-
-   39 id_seq_function: %empty
-   40                | inicio_function
-
-   41 params: %empty
-   42       | IDENTIFIER param
-
-   43 param: %empty
-   44      | ',' IDENTIFIER
-   45      | ',' IDENTIFIER '(' params ')'
-
-   46 commands: %empty
-   47         | command ';' commands
-
-   48 command: SKIP
-   49        | ESCALONAR
-
-   50 $@18: %empty
-
-   51 command: DIVISAO $@18 exp
-   52        | TREINAMENTO
-   53        | PREDICAO
-   54        | RESULTADO resultados
-   55        | READ IDENTIFIER
-   56        | WRITE IDENTIFIER
-
-   57 $@19: %empty
-
-   58 command: IDENTIFIER ASSGNOP $@19 exp
-
-   59 $@20: %empty
-
-   60 $@21: %empty
-
-   61 $@22: %empty
-
-   62 command: $@20 IF exp $@21 THEN commands FI $@22
-
-   63 resultados: ACURACIA
-
-   64 inicio_function: %empty
-
-   65 $@23: %empty
-
-   66 $@24: %empty
-
-   67 $@25: %empty
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function ')' $@24 $@25 exp_function ';'
-
-   69 exp_function: LET declarations IN commands END
-
-   70 exp: NUMINT
-   71    | NUMFLT
-   72    | IDENTIFIER
-
-   73 $@26: %empty
-
-   74 $@27: %empty
-
-   75 exp: '(' $@26 exp ')' $@27
-   76    | IDENTIFIER '(' params ')'
+   29 exp: '(' $@9 exp ')' $@10
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'(' (40) 45 68 75 76
-')' (41) 45 68 75 76
+'(' (40) 29
+')' (41) 29
 '*' (42)
 '+' (43)
-',' (44) 16 18 20 36 38 44 45
 '-' (45)
 '/' (47)
-';' (59) 25 29 33 47 68
+';' (59) 3
 '<' (60)
 '=' (61)
 '>' (62)
 '^' (94)
 error (256)
-LET (258) 3 69
-IN (259) 3 69
-INTEGER (260) 5 9 16 25
-FLOAT (261) 6 11 18 29
-SKIP (262) 48
-IF (263) 62
-THEN (264) 62
-END (265) 3 69
-READ (266) 55
-WRITE (267) 56
-FI (268) 62
-NUMINT (269) 70
-NUMFLT (270) 71
-IDENTIFIER (271) 5 6 9 11 13 16 18 20 25 29 33 36 38 42 44 45 55 56
-    58 72 76
-BOOLEAN (272) 13 20
-FUNCTION (273) 68
-CARREGA (274) 33
-TREINAMENTO (275) 52
-PREDICAO (276) 53
-RESULTADO (277) 54
-ACURACIA (278) 63
-DIVISAO (279) 51
-ESCALONAR (280) 49
-ASSGNOP (281) 58
+SKIP (258) 4
+IF (259) 22
+THEN (260) 22
+READ (261) 15
+WRITE (262) 16
+FI (263) 22
+NUMINT (264) 24
+NUMFLT (265) 25
+IDENTIFIER (266) 8 15 16 18 26
+CARREGA (267) 8
+TREINAMENTO (268) 12
+PREDICAO (269) 13
+RESULTADO (270) 14
+ACURACIA (271) 23
+DIVISAO (272) 11
+ESCALONAR (273) 9
+TRANSFORMAR (274)
+ASSGNOP (275) 18
 
 
 Nonterminals, with rules where they appear
 
-$accept (39)
+$accept (32)
     on left: 0
-program (40)
-    on left: 3, on right: 0
-$@1 (41)
-    on left: 1, on right: 3
-$@2 (42)
-    on left: 2, on right: 3
-declaration_function (43)
-    on left: 4 5 6, on right: 68
-parametros_function (44)
-    on left: 7 9 11 13, on right: 68
-$@3 (45)
-    on left: 8, on right: 9
-$@4 (46)
+program (33)
+    on left: 1, on right: 0
+commands (34)
+    on left: 2 3, on right: 1 3 22
+command (35)
+    on left: 4 8 9 11 12 13 14 15 16 18 22, on right: 3
+$@1 (36)
+    on left: 5, on right: 8
+$@2 (37)
+    on left: 6, on right: 8
+$@3 (38)
+    on left: 7, on right: 8
+$@4 (39)
     on left: 10, on right: 11
-$@5 (47)
-    on left: 12, on right: 13
-id_param_functions (48)
-    on left: 14 16 18 20, on right: 9 11 13 16 18 20
-$@6 (49)
-    on left: 15, on right: 16
-$@7 (50)
+$@5 (40)
     on left: 17, on right: 18
-$@8 (51)
-    on left: 19, on right: 20
-declarations (52)
-    on left: 21 25 29 33 34, on right: 3 25 29 33 69
-$@9 (53)
-    on left: 22, on right: 25
-$@10 (54)
-    on left: 23, on right: 25
-$@11 (55)
-    on left: 24, on right: 25
-$@12 (56)
-    on left: 26, on right: 29
-$@13 (57)
+$@6 (41)
+    on left: 19, on right: 22
+$@7 (42)
+    on left: 20, on right: 22
+$@8 (43)
+    on left: 21, on right: 22
+resultados (44)
+    on left: 23, on right: 14
+exp (45)
+    on left: 24 25 26 29, on right: 11 18 22 29
+$@9 (46)
     on left: 27, on right: 29
-$@14 (58)
+$@10 (47)
     on left: 28, on right: 29
-$@15 (59)
-    on left: 30, on right: 33
-$@16 (60)
-    on left: 31, on right: 33
-$@17 (61)
-    on left: 32, on right: 33
-id_seq_int (62)
-    on left: 35 36, on right: 25 36
-id_seq_float (63)
-    on left: 37 38, on right: 29 33 38
-id_seq_function (64)
-    on left: 39 40, on right: 34
-params (65)
-    on left: 41 42, on right: 45 76
-param (66)
-    on left: 43 44 45, on right: 42
-commands (67)
-    on left: 46 47, on right: 3 47 62 69
-command (68)
-    on left: 48 49 51 52 53 54 55 56 58 62, on right: 47
-$@18 (69)
-    on left: 50, on right: 51
-$@19 (70)
-    on left: 57, on right: 58
-$@20 (71)
-    on left: 59, on right: 62
-$@21 (72)
-    on left: 60, on right: 62
-$@22 (73)
-    on left: 61, on right: 62
-resultados (74)
-    on left: 63, on right: 54
-inicio_function (75)
-    on left: 64 68, on right: 34 40
-$@23 (76)
-    on left: 65, on right: 68
-$@24 (77)
-    on left: 66, on right: 68
-$@25 (78)
-    on left: 67, on right: 68
-exp_function (79)
-    on left: 69, on right: 68
-exp (80)
-    on left: 70 71 72 75 76, on right: 51 58 62 75
-$@26 (81)
-    on left: 73, on right: 75
-$@27 (82)
-    on left: 74, on right: 75
 
 
 State 0
 
     0 $accept: . program $end
 
-    LET  shift, and go to state 1
+    SKIP         shift, and go to state 1
+    READ         shift, and go to state 2
+    WRITE        shift, and go to state 3
+    IDENTIFIER   shift, and go to state 4
+    CARREGA      shift, and go to state 5
+    TREINAMENTO  shift, and go to state 6
+    PREDICAO     shift, and go to state 7
+    RESULTADO    shift, and go to state 8
+    DIVISAO      shift, and go to state 9
+    ESCALONAR    shift, and go to state 10
 
-    program  go to state 2
+    IF        reduce using rule 19 ($@6)
+    $default  reduce using rule 2 (commands)
+
+    program   go to state 11
+    commands  go to state 12
+    command   go to state 13
+    $@6       go to state 14
 
 
 State 1
 
-    3 program: LET . declarations IN $@1 commands $@2 END
+    4 command: SKIP .
 
-    INTEGER   shift, and go to state 3
-    FLOAT     shift, and go to state 4
-    FUNCTION  shift, and go to state 5
-    CARREGA   shift, and go to state 6
-
-    IN        reduce using rule 21 (declarations)
-    IN        [reduce using rule 64 (inicio_function)]
-    FUNCTION  [reduce using rule 64 (inicio_function)]
-    $default  reduce using rule 21 (declarations)
-
-    declarations     go to state 7
-    inicio_function  go to state 8
+    $default  reduce using rule 4 (command)
 
 
 State 2
 
-    0 $accept: program . $end
+   15 command: READ . IDENTIFIER
 
-    $end  shift, and go to state 9
+    IDENTIFIER  shift, and go to state 15
 
 
 State 3
 
-   25 declarations: INTEGER . $@9 id_seq_int IDENTIFIER $@10 ';' $@11 declarations
+   16 command: WRITE . IDENTIFIER
 
-    $default  reduce using rule 22 ($@9)
-
-    $@9  go to state 10
+    IDENTIFIER  shift, and go to state 16
 
 
 State 4
 
-   29 declarations: FLOAT . $@12 id_seq_float IDENTIFIER $@13 ';' $@14 declarations
+   18 command: IDENTIFIER . ASSGNOP $@5 exp
 
-    $default  reduce using rule 26 ($@12)
-
-    $@12  go to state 11
+    ASSGNOP  shift, and go to state 17
 
 
 State 5
 
-   68 inicio_function: FUNCTION . declaration_function $@23 '(' parametros_function ')' $@24 $@25 exp_function ';'
+    8 command: CARREGA . $@1 IDENTIFIER $@2 IDENTIFIER $@3
 
-    INTEGER  shift, and go to state 12
-    FLOAT    shift, and go to state 13
+    $default  reduce using rule 5 ($@1)
 
-    $default  reduce using rule 4 (declaration_function)
-
-    declaration_function  go to state 14
+    $@1  go to state 18
 
 
 State 6
 
-   33 declarations: CARREGA . $@15 id_seq_float IDENTIFIER $@16 ';' $@17 declarations
+   12 command: TREINAMENTO .
 
-    $default  reduce using rule 30 ($@15)
-
-    $@15  go to state 15
+    $default  reduce using rule 12 (command)
 
 
 State 7
 
-    3 program: LET declarations . IN $@1 commands $@2 END
+   13 command: PREDICAO .
 
-    IN  shift, and go to state 16
+    $default  reduce using rule 13 (command)
 
 
 State 8
 
-   34 declarations: inicio_function . id_seq_function
+   14 command: RESULTADO . resultados
 
-    FUNCTION  shift, and go to state 5
+    ACURACIA  shift, and go to state 19
 
-    IN        reduce using rule 39 (id_seq_function)
-    IN        [reduce using rule 64 (inicio_function)]
-    $default  reduce using rule 39 (id_seq_function)
-
-    id_seq_function  go to state 17
-    inicio_function  go to state 18
+    resultados  go to state 20
 
 
 State 9
+
+   11 command: DIVISAO . $@4 exp
+
+    $default  reduce using rule 10 ($@4)
+
+    $@4  go to state 21
+
+
+State 10
+
+    9 command: ESCALONAR .
+
+    $default  reduce using rule 9 (command)
+
+
+State 11
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 22
+
+
+State 12
+
+    1 program: commands .
+
+    $default  reduce using rule 1 (program)
+
+
+State 13
+
+    3 commands: command . ';' commands
+
+    ';'  shift, and go to state 23
+
+
+State 14
+
+   22 command: $@6 . IF exp $@7 THEN commands FI $@8
+
+    IF  shift, and go to state 24
+
+
+State 15
+
+   15 command: READ IDENTIFIER .
+
+    $default  reduce using rule 15 (command)
+
+
+State 16
+
+   16 command: WRITE IDENTIFIER .
+
+    $default  reduce using rule 16 (command)
+
+
+State 17
+
+   18 command: IDENTIFIER ASSGNOP . $@5 exp
+
+    $default  reduce using rule 17 ($@5)
+
+    $@5  go to state 25
+
+
+State 18
+
+    8 command: CARREGA $@1 . IDENTIFIER $@2 IDENTIFIER $@3
+
+    IDENTIFIER  shift, and go to state 26
+
+
+State 19
+
+   23 resultados: ACURACIA .
+
+    $default  reduce using rule 23 (resultados)
+
+
+State 20
+
+   14 command: RESULTADO resultados .
+
+    $default  reduce using rule 14 (command)
+
+
+State 21
+
+   11 command: DIVISAO $@4 . exp
+
+    NUMINT      shift, and go to state 27
+    NUMFLT      shift, and go to state 28
+    IDENTIFIER  shift, and go to state 29
+    '('         shift, and go to state 30
+
+    exp  go to state 31
+
+
+State 22
 
     0 $accept: program $end .
 
     $default  accept
 
 
-State 10
-
-   25 declarations: INTEGER $@9 . id_seq_int IDENTIFIER $@10 ';' $@11 declarations
-
-    $default  reduce using rule 35 (id_seq_int)
-
-    id_seq_int  go to state 19
-
-
-State 11
-
-   29 declarations: FLOAT $@12 . id_seq_float IDENTIFIER $@13 ';' $@14 declarations
-
-    $default  reduce using rule 37 (id_seq_float)
-
-    id_seq_float  go to state 20
-
-
-State 12
-
-    5 declaration_function: INTEGER . IDENTIFIER
-
-    IDENTIFIER  shift, and go to state 21
-
-
-State 13
-
-    6 declaration_function: FLOAT . IDENTIFIER
-
-    IDENTIFIER  shift, and go to state 22
-
-
-State 14
-
-   68 inicio_function: FUNCTION declaration_function . $@23 '(' parametros_function ')' $@24 $@25 exp_function ';'
-
-    $default  reduce using rule 65 ($@23)
-
-    $@23  go to state 23
-
-
-State 15
-
-   33 declarations: CARREGA $@15 . id_seq_float IDENTIFIER $@16 ';' $@17 declarations
-
-    $default  reduce using rule 37 (id_seq_float)
-
-    id_seq_float  go to state 24
-
-
-State 16
-
-    3 program: LET declarations IN . $@1 commands $@2 END
-
-    $default  reduce using rule 1 ($@1)
-
-    $@1  go to state 25
-
-
-State 17
-
-   34 declarations: inicio_function id_seq_function .
-
-    $default  reduce using rule 34 (declarations)
-
-
-State 18
-
-   40 id_seq_function: inicio_function .
-
-    $default  reduce using rule 40 (id_seq_function)
-
-
-State 19
-
-   25 declarations: INTEGER $@9 id_seq_int . IDENTIFIER $@10 ';' $@11 declarations
-   36 id_seq_int: id_seq_int . IDENTIFIER ','
-
-    IDENTIFIER  shift, and go to state 26
-
-
-State 20
-
-   29 declarations: FLOAT $@12 id_seq_float . IDENTIFIER $@13 ';' $@14 declarations
-   38 id_seq_float: id_seq_float . IDENTIFIER ','
-
-    IDENTIFIER  shift, and go to state 27
-
-
-State 21
-
-    5 declaration_function: INTEGER IDENTIFIER .
-
-    $default  reduce using rule 5 (declaration_function)
-
-
-State 22
-
-    6 declaration_function: FLOAT IDENTIFIER .
-
-    $default  reduce using rule 6 (declaration_function)
-
-
 State 23
 
-   68 inicio_function: FUNCTION declaration_function $@23 . '(' parametros_function ')' $@24 $@25 exp_function ';'
+    3 commands: command ';' . commands
 
-    '('  shift, and go to state 28
+    SKIP         shift, and go to state 1
+    READ         shift, and go to state 2
+    WRITE        shift, and go to state 3
+    IDENTIFIER   shift, and go to state 4
+    CARREGA      shift, and go to state 5
+    TREINAMENTO  shift, and go to state 6
+    PREDICAO     shift, and go to state 7
+    RESULTADO    shift, and go to state 8
+    DIVISAO      shift, and go to state 9
+    ESCALONAR    shift, and go to state 10
+
+    IF        reduce using rule 19 ($@6)
+    $default  reduce using rule 2 (commands)
+
+    commands  go to state 32
+    command   go to state 13
+    $@6       go to state 14
 
 
 State 24
 
-   33 declarations: CARREGA $@15 id_seq_float . IDENTIFIER $@16 ';' $@17 declarations
-   38 id_seq_float: id_seq_float . IDENTIFIER ','
+   22 command: $@6 IF . exp $@7 THEN commands FI $@8
 
+    NUMINT      shift, and go to state 27
+    NUMFLT      shift, and go to state 28
     IDENTIFIER  shift, and go to state 29
+    '('         shift, and go to state 30
+
+    exp  go to state 33
 
 
 State 25
 
-    3 program: LET declarations IN $@1 . commands $@2 END
+   18 command: IDENTIFIER ASSGNOP $@5 . exp
 
-    SKIP         shift, and go to state 30
-    READ         shift, and go to state 31
-    WRITE        shift, and go to state 32
-    IDENTIFIER   shift, and go to state 33
-    TREINAMENTO  shift, and go to state 34
-    PREDICAO     shift, and go to state 35
-    RESULTADO    shift, and go to state 36
-    DIVISAO      shift, and go to state 37
-    ESCALONAR    shift, and go to state 38
+    NUMINT      shift, and go to state 27
+    NUMFLT      shift, and go to state 28
+    IDENTIFIER  shift, and go to state 29
+    '('         shift, and go to state 30
 
-    IF        reduce using rule 59 ($@20)
-    $default  reduce using rule 46 (commands)
-
-    commands  go to state 39
-    command   go to state 40
-    $@20      go to state 41
+    exp  go to state 34
 
 
 State 26
 
-   25 declarations: INTEGER $@9 id_seq_int IDENTIFIER . $@10 ';' $@11 declarations
-   36 id_seq_int: id_seq_int IDENTIFIER . ','
+    8 command: CARREGA $@1 IDENTIFIER . $@2 IDENTIFIER $@3
 
-    ','  shift, and go to state 42
+    $default  reduce using rule 6 ($@2)
 
-    $default  reduce using rule 23 ($@10)
-
-    $@10  go to state 43
+    $@2  go to state 35
 
 
 State 27
 
-   29 declarations: FLOAT $@12 id_seq_float IDENTIFIER . $@13 ';' $@14 declarations
-   38 id_seq_float: id_seq_float IDENTIFIER . ','
+   24 exp: NUMINT .
 
-    ','  shift, and go to state 44
-
-    $default  reduce using rule 27 ($@13)
-
-    $@13  go to state 45
+    $default  reduce using rule 24 (exp)
 
 
 State 28
 
-   68 inicio_function: FUNCTION declaration_function $@23 '(' . parametros_function ')' $@24 $@25 exp_function ';'
+   25 exp: NUMFLT .
 
-    INTEGER  shift, and go to state 46
-    FLOAT    shift, and go to state 47
-    BOOLEAN  shift, and go to state 48
-
-    $default  reduce using rule 7 (parametros_function)
-
-    parametros_function  go to state 49
+    $default  reduce using rule 25 (exp)
 
 
 State 29
 
-   33 declarations: CARREGA $@15 id_seq_float IDENTIFIER . $@16 ';' $@17 declarations
-   38 id_seq_float: id_seq_float IDENTIFIER . ','
+   26 exp: IDENTIFIER .
 
-    ','  shift, and go to state 44
-
-    $default  reduce using rule 31 ($@16)
-
-    $@16  go to state 50
+    $default  reduce using rule 26 (exp)
 
 
 State 30
 
-   48 command: SKIP .
+   29 exp: '(' . $@9 exp ')' $@10
 
-    $default  reduce using rule 48 (command)
+    $default  reduce using rule 27 ($@9)
+
+    $@9  go to state 36
 
 
 State 31
 
-   55 command: READ . IDENTIFIER
+   11 command: DIVISAO $@4 exp .
 
-    IDENTIFIER  shift, and go to state 51
+    $default  reduce using rule 11 (command)
 
 
 State 32
 
-   56 command: WRITE . IDENTIFIER
+    3 commands: command ';' commands .
 
-    IDENTIFIER  shift, and go to state 52
+    $default  reduce using rule 3 (commands)
 
 
 State 33
 
-   58 command: IDENTIFIER . ASSGNOP $@19 exp
+   22 command: $@6 IF exp . $@7 THEN commands FI $@8
 
-    ASSGNOP  shift, and go to state 53
+    $default  reduce using rule 20 ($@7)
+
+    $@7  go to state 37
 
 
 State 34
 
-   52 command: TREINAMENTO .
+   18 command: IDENTIFIER ASSGNOP $@5 exp .
 
-    $default  reduce using rule 52 (command)
+    $default  reduce using rule 18 (command)
 
 
 State 35
 
-   53 command: PREDICAO .
+    8 command: CARREGA $@1 IDENTIFIER $@2 . IDENTIFIER $@3
 
-    $default  reduce using rule 53 (command)
+    IDENTIFIER  shift, and go to state 38
 
 
 State 36
 
-   54 command: RESULTADO . resultados
+   29 exp: '(' $@9 . exp ')' $@10
 
-    ACURACIA  shift, and go to state 54
+    NUMINT      shift, and go to state 27
+    NUMFLT      shift, and go to state 28
+    IDENTIFIER  shift, and go to state 29
+    '('         shift, and go to state 30
 
-    resultados  go to state 55
+    exp  go to state 39
 
 
 State 37
 
-   51 command: DIVISAO . $@18 exp
+   22 command: $@6 IF exp $@7 . THEN commands FI $@8
 
-    $default  reduce using rule 50 ($@18)
-
-    $@18  go to state 56
+    THEN  shift, and go to state 40
 
 
 State 38
 
-   49 command: ESCALONAR .
+    8 command: CARREGA $@1 IDENTIFIER $@2 IDENTIFIER . $@3
 
-    $default  reduce using rule 49 (command)
+    $default  reduce using rule 7 ($@3)
+
+    $@3  go to state 41
 
 
 State 39
 
-    3 program: LET declarations IN $@1 commands . $@2 END
+   29 exp: '(' $@9 exp . ')' $@10
 
-    $default  reduce using rule 2 ($@2)
-
-    $@2  go to state 57
+    ')'  shift, and go to state 42
 
 
 State 40
 
-   47 commands: command . ';' commands
+   22 command: $@6 IF exp $@7 THEN . commands FI $@8
 
-    ';'  shift, and go to state 58
+    SKIP         shift, and go to state 1
+    READ         shift, and go to state 2
+    WRITE        shift, and go to state 3
+    IDENTIFIER   shift, and go to state 4
+    CARREGA      shift, and go to state 5
+    TREINAMENTO  shift, and go to state 6
+    PREDICAO     shift, and go to state 7
+    RESULTADO    shift, and go to state 8
+    DIVISAO      shift, and go to state 9
+    ESCALONAR    shift, and go to state 10
+
+    IF        reduce using rule 19 ($@6)
+    $default  reduce using rule 2 (commands)
+
+    commands  go to state 43
+    command   go to state 13
+    $@6       go to state 14
 
 
 State 41
 
-   62 command: $@20 . IF exp $@21 THEN commands FI $@22
+    8 command: CARREGA $@1 IDENTIFIER $@2 IDENTIFIER $@3 .
 
-    IF  shift, and go to state 59
+    $default  reduce using rule 8 (command)
 
 
 State 42
 
-   36 id_seq_int: id_seq_int IDENTIFIER ',' .
+   29 exp: '(' $@9 exp ')' . $@10
 
-    $default  reduce using rule 36 (id_seq_int)
+    $default  reduce using rule 28 ($@10)
+
+    $@10  go to state 44
 
 
 State 43
 
-   25 declarations: INTEGER $@9 id_seq_int IDENTIFIER $@10 . ';' $@11 declarations
+   22 command: $@6 IF exp $@7 THEN commands . FI $@8
 
-    ';'  shift, and go to state 60
+    FI  shift, and go to state 45
 
 
 State 44
 
-   38 id_seq_float: id_seq_float IDENTIFIER ',' .
+   29 exp: '(' $@9 exp ')' $@10 .
 
-    $default  reduce using rule 38 (id_seq_float)
+    $default  reduce using rule 29 (exp)
 
 
 State 45
 
-   29 declarations: FLOAT $@12 id_seq_float IDENTIFIER $@13 . ';' $@14 declarations
+   22 command: $@6 IF exp $@7 THEN commands FI . $@8
 
-    ';'  shift, and go to state 61
+    $default  reduce using rule 21 ($@8)
+
+    $@8  go to state 46
 
 
 State 46
 
-    9 parametros_function: INTEGER . IDENTIFIER $@3 id_param_functions
+   22 command: $@6 IF exp $@7 THEN commands FI $@8 .
 
-    IDENTIFIER  shift, and go to state 62
-
-
-State 47
-
-   11 parametros_function: FLOAT . IDENTIFIER $@4 id_param_functions
-
-    IDENTIFIER  shift, and go to state 63
-
-
-State 48
-
-   13 parametros_function: BOOLEAN . IDENTIFIER $@5 id_param_functions
-
-    IDENTIFIER  shift, and go to state 64
-
-
-State 49
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function . ')' $@24 $@25 exp_function ';'
-
-    ')'  shift, and go to state 65
-
-
-State 50
-
-   33 declarations: CARREGA $@15 id_seq_float IDENTIFIER $@16 . ';' $@17 declarations
-
-    ';'  shift, and go to state 66
-
-
-State 51
-
-   55 command: READ IDENTIFIER .
-
-    $default  reduce using rule 55 (command)
-
-
-State 52
-
-   56 command: WRITE IDENTIFIER .
-
-    $default  reduce using rule 56 (command)
-
-
-State 53
-
-   58 command: IDENTIFIER ASSGNOP . $@19 exp
-
-    $default  reduce using rule 57 ($@19)
-
-    $@19  go to state 67
-
-
-State 54
-
-   63 resultados: ACURACIA .
-
-    $default  reduce using rule 63 (resultados)
-
-
-State 55
-
-   54 command: RESULTADO resultados .
-
-    $default  reduce using rule 54 (command)
-
-
-State 56
-
-   51 command: DIVISAO $@18 . exp
-
-    NUMINT      shift, and go to state 68
-    NUMFLT      shift, and go to state 69
-    IDENTIFIER  shift, and go to state 70
-    '('         shift, and go to state 71
-
-    exp  go to state 72
-
-
-State 57
-
-    3 program: LET declarations IN $@1 commands $@2 . END
-
-    END  shift, and go to state 73
-
-
-State 58
-
-   47 commands: command ';' . commands
-
-    SKIP         shift, and go to state 30
-    READ         shift, and go to state 31
-    WRITE        shift, and go to state 32
-    IDENTIFIER   shift, and go to state 33
-    TREINAMENTO  shift, and go to state 34
-    PREDICAO     shift, and go to state 35
-    RESULTADO    shift, and go to state 36
-    DIVISAO      shift, and go to state 37
-    ESCALONAR    shift, and go to state 38
-
-    IF        reduce using rule 59 ($@20)
-    $default  reduce using rule 46 (commands)
-
-    commands  go to state 74
-    command   go to state 40
-    $@20      go to state 41
-
-
-State 59
-
-   62 command: $@20 IF . exp $@21 THEN commands FI $@22
-
-    NUMINT      shift, and go to state 68
-    NUMFLT      shift, and go to state 69
-    IDENTIFIER  shift, and go to state 70
-    '('         shift, and go to state 71
-
-    exp  go to state 75
-
-
-State 60
-
-   25 declarations: INTEGER $@9 id_seq_int IDENTIFIER $@10 ';' . $@11 declarations
-
-    $default  reduce using rule 24 ($@11)
-
-    $@11  go to state 76
-
-
-State 61
-
-   29 declarations: FLOAT $@12 id_seq_float IDENTIFIER $@13 ';' . $@14 declarations
-
-    $default  reduce using rule 28 ($@14)
-
-    $@14  go to state 77
-
-
-State 62
-
-    9 parametros_function: INTEGER IDENTIFIER . $@3 id_param_functions
-
-    $default  reduce using rule 8 ($@3)
-
-    $@3  go to state 78
-
-
-State 63
-
-   11 parametros_function: FLOAT IDENTIFIER . $@4 id_param_functions
-
-    $default  reduce using rule 10 ($@4)
-
-    $@4  go to state 79
-
-
-State 64
-
-   13 parametros_function: BOOLEAN IDENTIFIER . $@5 id_param_functions
-
-    $default  reduce using rule 12 ($@5)
-
-    $@5  go to state 80
-
-
-State 65
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function ')' . $@24 $@25 exp_function ';'
-
-    $default  reduce using rule 66 ($@24)
-
-    $@24  go to state 81
-
-
-State 66
-
-   33 declarations: CARREGA $@15 id_seq_float IDENTIFIER $@16 ';' . $@17 declarations
-
-    $default  reduce using rule 32 ($@17)
-
-    $@17  go to state 82
-
-
-State 67
-
-   58 command: IDENTIFIER ASSGNOP $@19 . exp
-
-    NUMINT      shift, and go to state 68
-    NUMFLT      shift, and go to state 69
-    IDENTIFIER  shift, and go to state 70
-    '('         shift, and go to state 71
-
-    exp  go to state 83
-
-
-State 68
-
-   70 exp: NUMINT .
-
-    $default  reduce using rule 70 (exp)
-
-
-State 69
-
-   71 exp: NUMFLT .
-
-    $default  reduce using rule 71 (exp)
-
-
-State 70
-
-   72 exp: IDENTIFIER .
-   76    | IDENTIFIER . '(' params ')'
-
-    '('  shift, and go to state 84
-
-    $default  reduce using rule 72 (exp)
-
-
-State 71
-
-   75 exp: '(' . $@26 exp ')' $@27
-
-    $default  reduce using rule 73 ($@26)
-
-    $@26  go to state 85
-
-
-State 72
-
-   51 command: DIVISAO $@18 exp .
-
-    $default  reduce using rule 51 (command)
-
-
-State 73
-
-    3 program: LET declarations IN $@1 commands $@2 END .
-
-    $default  reduce using rule 3 (program)
-
-
-State 74
-
-   47 commands: command ';' commands .
-
-    $default  reduce using rule 47 (commands)
-
-
-State 75
-
-   62 command: $@20 IF exp . $@21 THEN commands FI $@22
-
-    $default  reduce using rule 60 ($@21)
-
-    $@21  go to state 86
-
-
-State 76
-
-   25 declarations: INTEGER $@9 id_seq_int IDENTIFIER $@10 ';' $@11 . declarations
-
-    INTEGER   shift, and go to state 3
-    FLOAT     shift, and go to state 4
-    FUNCTION  shift, and go to state 5
-    CARREGA   shift, and go to state 6
-
-    IN        reduce using rule 21 (declarations)
-    IN        [reduce using rule 64 (inicio_function)]
-    FUNCTION  [reduce using rule 64 (inicio_function)]
-    $default  reduce using rule 21 (declarations)
-
-    declarations     go to state 87
-    inicio_function  go to state 8
-
-
-State 77
-
-   29 declarations: FLOAT $@12 id_seq_float IDENTIFIER $@13 ';' $@14 . declarations
-
-    INTEGER   shift, and go to state 3
-    FLOAT     shift, and go to state 4
-    FUNCTION  shift, and go to state 5
-    CARREGA   shift, and go to state 6
-
-    IN        reduce using rule 21 (declarations)
-    IN        [reduce using rule 64 (inicio_function)]
-    FUNCTION  [reduce using rule 64 (inicio_function)]
-    $default  reduce using rule 21 (declarations)
-
-    declarations     go to state 88
-    inicio_function  go to state 8
-
-
-State 78
-
-    9 parametros_function: INTEGER IDENTIFIER $@3 . id_param_functions
-
-    ','  shift, and go to state 89
-
-    $default  reduce using rule 14 (id_param_functions)
-
-    id_param_functions  go to state 90
-
-
-State 79
-
-   11 parametros_function: FLOAT IDENTIFIER $@4 . id_param_functions
-
-    ','  shift, and go to state 89
-
-    $default  reduce using rule 14 (id_param_functions)
-
-    id_param_functions  go to state 91
-
-
-State 80
-
-   13 parametros_function: BOOLEAN IDENTIFIER $@5 . id_param_functions
-
-    ','  shift, and go to state 89
-
-    $default  reduce using rule 14 (id_param_functions)
-
-    id_param_functions  go to state 92
-
-
-State 81
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function ')' $@24 . $@25 exp_function ';'
-
-    $default  reduce using rule 67 ($@25)
-
-    $@25  go to state 93
-
-
-State 82
-
-   33 declarations: CARREGA $@15 id_seq_float IDENTIFIER $@16 ';' $@17 . declarations
-
-    INTEGER   shift, and go to state 3
-    FLOAT     shift, and go to state 4
-    FUNCTION  shift, and go to state 5
-    CARREGA   shift, and go to state 6
-
-    IN        reduce using rule 21 (declarations)
-    IN        [reduce using rule 64 (inicio_function)]
-    FUNCTION  [reduce using rule 64 (inicio_function)]
-    $default  reduce using rule 21 (declarations)
-
-    declarations     go to state 94
-    inicio_function  go to state 8
-
-
-State 83
-
-   58 command: IDENTIFIER ASSGNOP $@19 exp .
-
-    $default  reduce using rule 58 (command)
-
-
-State 84
-
-   76 exp: IDENTIFIER '(' . params ')'
-
-    IDENTIFIER  shift, and go to state 95
-
-    $default  reduce using rule 41 (params)
-
-    params  go to state 96
-
-
-State 85
-
-   75 exp: '(' $@26 . exp ')' $@27
-
-    NUMINT      shift, and go to state 68
-    NUMFLT      shift, and go to state 69
-    IDENTIFIER  shift, and go to state 70
-    '('         shift, and go to state 71
-
-    exp  go to state 97
-
-
-State 86
-
-   62 command: $@20 IF exp $@21 . THEN commands FI $@22
-
-    THEN  shift, and go to state 98
-
-
-State 87
-
-   25 declarations: INTEGER $@9 id_seq_int IDENTIFIER $@10 ';' $@11 declarations .
-
-    $default  reduce using rule 25 (declarations)
-
-
-State 88
-
-   29 declarations: FLOAT $@12 id_seq_float IDENTIFIER $@13 ';' $@14 declarations .
-
-    $default  reduce using rule 29 (declarations)
-
-
-State 89
-
-   16 id_param_functions: ',' . INTEGER IDENTIFIER $@6 id_param_functions
-   18                   | ',' . FLOAT IDENTIFIER $@7 id_param_functions
-   20                   | ',' . BOOLEAN IDENTIFIER $@8 id_param_functions
-
-    INTEGER  shift, and go to state 99
-    FLOAT    shift, and go to state 100
-    BOOLEAN  shift, and go to state 101
-
-
-State 90
-
-    9 parametros_function: INTEGER IDENTIFIER $@3 id_param_functions .
-
-    $default  reduce using rule 9 (parametros_function)
-
-
-State 91
-
-   11 parametros_function: FLOAT IDENTIFIER $@4 id_param_functions .
-
-    $default  reduce using rule 11 (parametros_function)
-
-
-State 92
-
-   13 parametros_function: BOOLEAN IDENTIFIER $@5 id_param_functions .
-
-    $default  reduce using rule 13 (parametros_function)
-
-
-State 93
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function ')' $@24 $@25 . exp_function ';'
-
-    LET  shift, and go to state 102
-
-    exp_function  go to state 103
-
-
-State 94
-
-   33 declarations: CARREGA $@15 id_seq_float IDENTIFIER $@16 ';' $@17 declarations .
-
-    $default  reduce using rule 33 (declarations)
-
-
-State 95
-
-   42 params: IDENTIFIER . param
-
-    ','  shift, and go to state 104
-
-    $default  reduce using rule 43 (param)
-
-    param  go to state 105
-
-
-State 96
-
-   76 exp: IDENTIFIER '(' params . ')'
-
-    ')'  shift, and go to state 106
-
-
-State 97
-
-   75 exp: '(' $@26 exp . ')' $@27
-
-    ')'  shift, and go to state 107
-
-
-State 98
-
-   62 command: $@20 IF exp $@21 THEN . commands FI $@22
-
-    SKIP         shift, and go to state 30
-    READ         shift, and go to state 31
-    WRITE        shift, and go to state 32
-    IDENTIFIER   shift, and go to state 33
-    TREINAMENTO  shift, and go to state 34
-    PREDICAO     shift, and go to state 35
-    RESULTADO    shift, and go to state 36
-    DIVISAO      shift, and go to state 37
-    ESCALONAR    shift, and go to state 38
-
-    IF        reduce using rule 59 ($@20)
-    $default  reduce using rule 46 (commands)
-
-    commands  go to state 108
-    command   go to state 40
-    $@20      go to state 41
-
-
-State 99
-
-   16 id_param_functions: ',' INTEGER . IDENTIFIER $@6 id_param_functions
-
-    IDENTIFIER  shift, and go to state 109
-
-
-State 100
-
-   18 id_param_functions: ',' FLOAT . IDENTIFIER $@7 id_param_functions
-
-    IDENTIFIER  shift, and go to state 110
-
-
-State 101
-
-   20 id_param_functions: ',' BOOLEAN . IDENTIFIER $@8 id_param_functions
-
-    IDENTIFIER  shift, and go to state 111
-
-
-State 102
-
-   69 exp_function: LET . declarations IN commands END
-
-    INTEGER   shift, and go to state 3
-    FLOAT     shift, and go to state 4
-    FUNCTION  shift, and go to state 5
-    CARREGA   shift, and go to state 6
-
-    IN        reduce using rule 21 (declarations)
-    IN        [reduce using rule 64 (inicio_function)]
-    FUNCTION  [reduce using rule 64 (inicio_function)]
-    $default  reduce using rule 21 (declarations)
-
-    declarations     go to state 112
-    inicio_function  go to state 8
-
-
-State 103
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function ')' $@24 $@25 exp_function . ';'
-
-    ';'  shift, and go to state 113
-
-
-State 104
-
-   44 param: ',' . IDENTIFIER
-   45      | ',' . IDENTIFIER '(' params ')'
-
-    IDENTIFIER  shift, and go to state 114
-
-
-State 105
-
-   42 params: IDENTIFIER param .
-
-    $default  reduce using rule 42 (params)
-
-
-State 106
-
-   76 exp: IDENTIFIER '(' params ')' .
-
-    $default  reduce using rule 76 (exp)
-
-
-State 107
-
-   75 exp: '(' $@26 exp ')' . $@27
-
-    $default  reduce using rule 74 ($@27)
-
-    $@27  go to state 115
-
-
-State 108
-
-   62 command: $@20 IF exp $@21 THEN commands . FI $@22
-
-    FI  shift, and go to state 116
-
-
-State 109
-
-   16 id_param_functions: ',' INTEGER IDENTIFIER . $@6 id_param_functions
-
-    $default  reduce using rule 15 ($@6)
-
-    $@6  go to state 117
-
-
-State 110
-
-   18 id_param_functions: ',' FLOAT IDENTIFIER . $@7 id_param_functions
-
-    $default  reduce using rule 17 ($@7)
-
-    $@7  go to state 118
-
-
-State 111
-
-   20 id_param_functions: ',' BOOLEAN IDENTIFIER . $@8 id_param_functions
-
-    $default  reduce using rule 19 ($@8)
-
-    $@8  go to state 119
-
-
-State 112
-
-   69 exp_function: LET declarations . IN commands END
-
-    IN  shift, and go to state 120
-
-
-State 113
-
-   68 inicio_function: FUNCTION declaration_function $@23 '(' parametros_function ')' $@24 $@25 exp_function ';' .
-
-    $default  reduce using rule 68 (inicio_function)
-
-
-State 114
-
-   44 param: ',' IDENTIFIER .
-   45      | ',' IDENTIFIER . '(' params ')'
-
-    '('  shift, and go to state 121
-
-    $default  reduce using rule 44 (param)
-
-
-State 115
-
-   75 exp: '(' $@26 exp ')' $@27 .
-
-    $default  reduce using rule 75 (exp)
-
-
-State 116
-
-   62 command: $@20 IF exp $@21 THEN commands FI . $@22
-
-    $default  reduce using rule 61 ($@22)
-
-    $@22  go to state 122
-
-
-State 117
-
-   16 id_param_functions: ',' INTEGER IDENTIFIER $@6 . id_param_functions
-
-    ','  shift, and go to state 89
-
-    $default  reduce using rule 14 (id_param_functions)
-
-    id_param_functions  go to state 123
-
-
-State 118
-
-   18 id_param_functions: ',' FLOAT IDENTIFIER $@7 . id_param_functions
-
-    ','  shift, and go to state 89
-
-    $default  reduce using rule 14 (id_param_functions)
-
-    id_param_functions  go to state 124
-
-
-State 119
-
-   20 id_param_functions: ',' BOOLEAN IDENTIFIER $@8 . id_param_functions
-
-    ','  shift, and go to state 89
-
-    $default  reduce using rule 14 (id_param_functions)
-
-    id_param_functions  go to state 125
-
-
-State 120
-
-   69 exp_function: LET declarations IN . commands END
-
-    SKIP         shift, and go to state 30
-    READ         shift, and go to state 31
-    WRITE        shift, and go to state 32
-    IDENTIFIER   shift, and go to state 33
-    TREINAMENTO  shift, and go to state 34
-    PREDICAO     shift, and go to state 35
-    RESULTADO    shift, and go to state 36
-    DIVISAO      shift, and go to state 37
-    ESCALONAR    shift, and go to state 38
-
-    IF        reduce using rule 59 ($@20)
-    $default  reduce using rule 46 (commands)
-
-    commands  go to state 126
-    command   go to state 40
-    $@20      go to state 41
-
-
-State 121
-
-   45 param: ',' IDENTIFIER '(' . params ')'
-
-    IDENTIFIER  shift, and go to state 95
-
-    $default  reduce using rule 41 (params)
-
-    params  go to state 127
-
-
-State 122
-
-   62 command: $@20 IF exp $@21 THEN commands FI $@22 .
-
-    $default  reduce using rule 62 (command)
-
-
-State 123
-
-   16 id_param_functions: ',' INTEGER IDENTIFIER $@6 id_param_functions .
-
-    $default  reduce using rule 16 (id_param_functions)
-
-
-State 124
-
-   18 id_param_functions: ',' FLOAT IDENTIFIER $@7 id_param_functions .
-
-    $default  reduce using rule 18 (id_param_functions)
-
-
-State 125
-
-   20 id_param_functions: ',' BOOLEAN IDENTIFIER $@8 id_param_functions .
-
-    $default  reduce using rule 20 (id_param_functions)
-
-
-State 126
-
-   69 exp_function: LET declarations IN commands . END
-
-    END  shift, and go to state 128
-
-
-State 127
-
-   45 param: ',' IDENTIFIER '(' params . ')'
-
-    ')'  shift, and go to state 129
-
-
-State 128
-
-   69 exp_function: LET declarations IN commands END .
-
-    $default  reduce using rule 69 (exp_function)
-
-
-State 129
-
-   45 param: ',' IDENTIFIER '(' params ')' .
-
-    $default  reduce using rule 45 (param)
+    $default  reduce using rule 22 (command)

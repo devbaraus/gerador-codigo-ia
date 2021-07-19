@@ -1,12 +1,10 @@
-let
-	carrega base credit_data classe 4 previsores 1;
+carrega base1 credit_data;
+carrega base2 risco_credito;
 
-in
-	escalonar previsores;
-	divisao 0.25;
-	classificador randomforest 40 base
-	treinamento base;
-	predicao base;
-	resultado acuracia;
+escalonar base1 previsores;
+divisao 0.25;
+classificador randomforest 40 base
+treinamento base;
+predicao base;
+resultado acuracia;
 	
-end

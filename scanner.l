@@ -14,12 +14,9 @@ ID       [_a-zA-Z][_A-Za-z0-9]*
 [-+]?{DIGIT}*"."{DIGIT}+ { printf("Real "); yylval.yflt = atof(yytext); return(NUMFLT);   }
 
 
-end      { printf("end "); return(END);      }
+
 fi       { printf("fi "); return(FI);       }
 if       { printf("if "); return(IF);       }
-in       { printf("in ");  return(IN);       }
-integer  { printf("tipo "); return(INTEGER);  }
-float    { printf("tipo "); return(FLOAT);  }
 carrega  { printf("carrega "); return(CARREGA); }
 divisao { printf("divisão "); return(DIVISAO); }
 escalonar { printf("escalonar "); return(ESCALONAR); }
@@ -28,8 +25,6 @@ treinamento { printf("treinamento "); return(TREINAMENTO); }
 predicao { printf("predição "); return(PREDICAO); }
 resultado { printf("resultado "); return(RESULTADO); }
 acuracia { printf("acurácia "); return(ACURACIA); }
-function { printf("function "); return(FUNCTION); }
-let      { printf("let "); return(LET);      }
 read     { printf("read "); return(READ);     }
 skip     { printf("skip "); return(SKIP);     }
 then     { printf("then ");return(THEN);     }

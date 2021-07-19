@@ -23,15 +23,11 @@ FILE * output;
 }
 
 %start program
-%token LET IN
-%token INTEGER
-%token FLOAT
-%token SKIP IF THEN END READ WRITE FI
+%token SKIP IF THEN READ WRITE FI
 %token <yint> NUMINT // antes era NUMBER agora subistitui
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER
-%token BOOLEAN FUNCTION
-%token CARREGA TREINAMENTO PREDICAO RESULTADO ACURACIA DIVISAO ESCALONAR
+%token CARREGA TREINAMENTO PREDICAO RESULTADO ACURACIA DIVISAO ESCALONAR TRANSFORMAR
 %token ASSGNOP
 %left '>' '<' '='
 %left '-' '+'
@@ -41,89 +37,39 @@ FILE * output;
 
 %%
 
-program : LET declarations IN { } commands { } END
-;
-/*Nome da função*/
-declaration_function : /* empty */ 
-| INTEGER IDENTIFIER { 
-	VAR *p=FindVAR($2);
-	ASSERT((p==NULL),"Identificador já declarado");
-	AddVAR($2,INT);
-	fprintf(output, "int %s", $2);
-}
-| FLOAT IDENTIFIER { 
-	VAR *p=FindVAR($2);
-	ASSERT((p==NULL),"Identificador já declarado");
-	AddVAR($2,FLT);
-	fprintf(output, "float %s", $2);
-}
-;
-parametros_function: /* empty */
-| INTEGER IDENTIFIER {fprintf(output,"int %s", $2); AddVAR($2,INT);} id_param_functions
-| FLOAT IDENTIFIER  {fprintf(output,"float %s", $2); AddVAR($2,FLT);} id_param_functions 
-| BOOLEAN IDENTIFIER {fprintf(output,"bool %s", $2); AddVAR($2,BOOL);} id_param_functions
-;
-id_param_functions : /* empty */
-| ',' INTEGER IDENTIFIER { fprintf(output, ", int %s", $3); AddVAR($3,INT);} id_param_functions
-| ',' FLOAT IDENTIFIER  { fprintf(output, ", float %s", $3); AddVAR($3,FLT);} id_param_functions
-| ',' BOOLEAN IDENTIFIER  { fprintf(output, ", bool %s", $3); AddVAR($3,BOOL);} id_param_functions
-;
-declarations : /* empty */
-| INTEGER { fprintf(output, "int "); } id_seq_int IDENTIFIER { fprintf(output, "%s", $4); } ';' { fprintf(output, "; \n"); } declarations { 
-	VAR *p=ChecarEscopo1($4);
-	ASSERT((p==NULL),"Identificador já declarado*");
-	AddVAR($4,INT); 
-}
-| FLOAT { fprintf(output, "float "); } id_seq_float IDENTIFIER { fprintf(output, "%s", $4); } ';' { fprintf(output, "; \n"); } declarations { 
-	VAR *p=ChecarEscopo1($4);
-	ASSERT((p==NULL),"Identificador já declarado+");
-	AddVAR($4,FLT);
-}
-| CARREGA { fprintf(output, "import pandas as pd\nbase "); } id_seq_float IDENTIFIER { fprintf(output, "= pd.read_csv('%s.csv')", $4); } ';' 
-	{ 
-		fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\ninicio_previsores = None\n#Substituir a linha abaixo pelo numero da coluna classe\ncoluna_classe = None\n\nprevisores = base.iloc[:, inicio_previsores:coluna_classe].values\nclasse = base.iloc[:, coluna_classe].values\n\n"); 
-	} declarations { 
-	VAR *p=FindVAR($4);
-	ASSERT((p==NULL),"base de dados ja foi carregada");
-	AddVAR($4,FLT);
-}
-| inicio_function id_seq_function // pode declarar 1 ou mais funções
-;
-id_seq_int : /* empty */
-| id_seq_int IDENTIFIER ','  { 
-	VAR *p=ChecarEscopo1($2);
-	ASSERT((p==NULL),"Identificador já declarado-");
-	AddVAR($2,INT);
-	fprintf(output, "%s, ", $2);
-} //pode ser tipo float ou int
-;
-id_seq_float : /* empty */
-| id_seq_float IDENTIFIER ','  { 
-	VAR *p=ChecarEscopo1($2);//ChecarEscopo1
-	ASSERT((p==NULL),"Identificador já declarado!");
-	AddVAR($2,FLT);
-	fprintf(output, "%s, ", $2);
-}
-;
-id_seq_function: /* empty */
-| inicio_function
-;
-//variáveis passadas como parâmetros na chamada de uma função
-params: /* empty*/
-| IDENTIFIER param
-;
-param: /* empty */
-| ',' IDENTIFIER
-| ',' IDENTIFIER '(' params ')' {// um parâmetro pode ser a chamada de uma função também
-	VAR *p=FindVAR($2);//pegando tipo da função
-	ASSERT((p!=NULL)," Função não declarada");
-}
+program : commands { }
 ;
 
 commands : /* empty */
 | command ';' /*{ fprintf(output, ";\n"); }*/ commands
 ;
 command : SKIP
+| CARREGA { 
+	fprintf(output, "import pandas as pd\n");
+  }
+  IDENTIFIER {
+	VAR *p=FindVAR($3);
+	if(p==NULL){//verifica se a base ainda não foi adicionada
+	  	AddVAR($3,FLT);// adicionando
+	}
+	else {
+		printf("base de dados ja foi carregada");
+	}
+  }
+  IDENTIFIER { //pegando o nome da base.csv
+		fprintf(output, "%s = pd.read_csv('%s.csv')", $3, $5);
+  }  
+  {
+	VAR *p=FindVAR($3);/*buscando o nome da variável que guardou a base para concatenar com o nome das
+	                     variáveis que serão geradas no python*/
+	//fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\ninicio_previsores = None\n#Substituir a linha abaixo pelo numero da coluna classe\ncoluna_classe = None\n\nprevisores = base.iloc[:, inicio_previsores:coluna_classe].values\nclasse = base.iloc[:, coluna_classe].values\n\n"); 
+	fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\n");
+	fprintf(output, "inicio_previsores_%s = 0\n", p->name);
+	fprintf(output, "#Substituir a linha abaixo pelo numero da coluna classe\n");
+	fprintf(output, "coluna_classe_%s = None\n\n", p->name);
+	fprintf(output, "previsores_%s = %s.iloc[:, inicio_previsores_%s:coluna_classe_%s].values\n", p->name, p->name, p->name, p->name);
+	fprintf(output, "classe_%s = %s.iloc[:, coluna_classe_%s].values\n\n",p->name, p->name, p->name);
+}
 | ESCALONAR {
 	fprintf(output, "\n#----------Escalonando os atributos -----------#\nfrom sklearn.preprocessing import StandardScaler\nscaler = StandardScaler()\nprevisores = scaler.fit_transform(previsores)\n");
 }
@@ -179,13 +125,6 @@ resultados: ACURACIA {
 }
 ;
 
-inicio_function: /* empty */
-| FUNCTION declaration_function { global_scope=1; fprintf(output, "(");} '(' parametros_function ')' {fprintf(output, ")");} {fprintf(output, "{\n");} exp_function ';' { fprintf(output, "}"); DestruirVAR(); global_scope=0; }
-;//ao trocar global_scope para 1 a partir desse momento todas as variáveis serão add dentro do scopo 1 :)
-
-exp_function: LET declarations IN commands END //expressores dentro do escopo da função
-;
-
 exp : NUMINT  { $$= INT; fprintf(output, "%d", $1);}
 | NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
 | IDENTIFIER  {// a única coisa guardada na tabela de simbolos
@@ -196,11 +135,6 @@ exp : NUMINT  { $$= INT; fprintf(output, "%d", $1);}
 	fprintf(output, "%s", $1);
 }
 | '(' {fprintf(output,"(");} exp ')' {fprintf(output,")");}  { $$= $3;}
-| IDENTIFIER '(' params ')' {// pode chamar função também f(paramns)
-	VAR *p=FindVAR($1);//pegando tipo da função
-	ASSERT((p!=NULL)," Função não declarada");
-	$$ = p->type;//retorno o tipo da função
-}
 ;
 
 %%
