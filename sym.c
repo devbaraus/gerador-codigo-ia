@@ -25,10 +25,10 @@ VAR *MakeVAR(char *name, int type, VAR *next) {
 
 VAR *FindVAR(char *name) {
 	VAR *p = SymTab;
-	printf("\nTo procurando por: %s", name);
+	//printf("\nTo procurando por: %s", name);
 
 	while( (p != NULL) && (p->name != name) ) {
-		printf("\n [nome: %s, scopo: %d] ",p->name, p->scope);
+		//printf("\n [nome: %s, scopo: %d] ",p->name, p->scope);
 		p = p->next;
 	}
 
@@ -37,18 +37,18 @@ VAR *FindVAR(char *name) {
 
 VAR *ChecarEscopo1(char *name) {
 	VAR *p = SymTab;
-	printf("\nTo procurando por: %s", name);
+	//printf("\nTo procurando por: %s", name);
 
 	while( (p != NULL) && (p->name != name) ) {
-		printf("\n [nome: %s, scopo: %d] ",p->name, p->scope);
+		//printf("\n [nome: %s, scopo: %d] ",p->name, p->scope);
 		p = p->next;
 	}
 
 	if (p!=NULL) {//se encontrou, checar se é do scopo 1 ou 0
-		printf("\nEstou retornando:  { nome: %s, scope: %d }   scopo_global: %d ",p->name,p->scope, global_scope);
+		//printf("\nEstou retornando:  { nome: %s, scope: %d }   scopo_global: %d ",p->name,p->scope, global_scope);
 		if((p->scope != 1)){//se a variavel que encontrou for diferente do escopo 1
 			p = NULL;//então retorna nulo
-			printf("Entrou aqui ");
+			//printf("Entrou aqui ");
 		}
 	}
 
@@ -60,7 +60,7 @@ VAR *DestruirVAR() {
 	VAR *proximo = NULL;
 
 	while(atual != NULL) {
-		printf("\n [nome: %s, scopo: %d] ",atual->name, atual->scope);
+		//printf("\n [nome: %s, scopo: %d] ",atual->name, atual->scope);
 		escopo1Destruido = 0;
 
 		if (atual->next != NULL) {//se tiver um próximo...
@@ -76,12 +76,12 @@ VAR *DestruirVAR() {
 			// }
 
 			if (proximo->scope == 1) {
-				printf(" proximo liberado: %d ", atual->next);
+				//printf(" proximo liberado: %d ", atual->next);
 				atual->next = NULL;
 				atual->next = proximo->next;//proximo do atual recebe o proximo do proximo
 				free(proximo);//liberar o proximo ponteiro
 				proximo = NULL;
-				printf("Liberando memória do ponteiro: %d, proximo: %d, var: %s, scopo: %d", atual,atual->next,atual->name, atual->scope);
+				//printf("Liberando memória do ponteiro: %d, proximo: %d, var: %s, scopo: %d", atual,atual->next,atual->name, atual->scope);
 				escopo1Destruido = 1;
 			}
 		}

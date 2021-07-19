@@ -52,22 +52,23 @@ extern int yydebug;
     SKIP = 262,
     IF = 263,
     THEN = 264,
-    ELSE = 265,
-    END = 266,
-    WHILE = 267,
-    DO = 268,
-    READ = 269,
-    WRITE = 270,
-    FI = 271,
-    RETURN = 272,
-    NUMINT = 273,
-    NUMFLT = 274,
-    IDENTIFIER = 275,
-    NUMBL = 276,
-    BOOLEAN = 277,
-    FUNCTION = 278,
-    ASSGNOP = 279,
-    MAIORIGUAL = 280
+    END = 265,
+    READ = 266,
+    WRITE = 267,
+    FI = 268,
+    NUMINT = 269,
+    NUMFLT = 270,
+    IDENTIFIER = 271,
+    BOOLEAN = 272,
+    FUNCTION = 273,
+    CARREGA = 274,
+    TREINAMENTO = 275,
+    PREDICAO = 276,
+    RESULTADO = 277,
+    ACURACIA = 278,
+    DIVISAO = 279,
+    ESCALONAR = 280,
+    ASSGNOP = 281
   };
 #endif
 
@@ -82,7 +83,7 @@ union YYSTYPE
 	int   yint;// 1
 	float yflt;
 
-#line 86 "parser.tab.h" /* yacc.c:1909  */
+#line 87 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -26,14 +26,14 @@ FILE * output;
 %token LET IN
 %token INTEGER
 %token FLOAT
-%token SKIP IF THEN END WHILE DO READ WRITE FI RETURN
+%token SKIP IF THEN END READ WRITE FI
 %token <yint> NUMINT // antes era NUMBER agora subistitui
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER
-%token NUMBL
-%token BOOLEAN FUNCTION CARREGA
-%token ASSGNOP MAIORIGUAL
-%left '>' '<' '=' MAIORIGUAL
+%token BOOLEAN FUNCTION
+%token CARREGA TREINAMENTO PREDICAO RESULTADO ACURACIA DIVISAO ESCALONAR
+%token ASSGNOP
+%left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
 %left '^'
@@ -41,7 +41,7 @@ FILE * output;
 
 %%
 
-program : LET declarations IN { fprintf(output, "\nint main(){\n"); } commands { fprintf(output, "\n}"); } END
+program : LET declarations IN { } commands { } END
 ;
 /*Nome da função*/
 declaration_function : /* empty */ 
@@ -79,8 +79,10 @@ declarations : /* empty */
 	ASSERT((p==NULL),"Identificador já declarado+");
 	AddVAR($4,FLT);
 }
-| CARREGA { fprintf(output, "import pandas as pd\nbase "); } id_seq_float IDENTIFIER { fprintf(output, "= pd.read_csv('%s.csv')", $4); } ';' { fprintf(output, "; \n"); } declarations { 
-	//fprintf(output, "base = pd.read_csv('%s')", $2);
+| CARREGA { fprintf(output, "import pandas as pd\nbase "); } id_seq_float IDENTIFIER { fprintf(output, "= pd.read_csv('%s.csv')", $4); } ';' 
+	{ 
+		fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\ninicio_previsores = None\n#Substituir a linha abaixo pelo numero da coluna classe\ncoluna_classe = None\n\nprevisores = base.iloc[:, inicio_previsores:coluna_classe].values\nclasse = base.iloc[:, coluna_classe].values\n\n"); 
+	} declarations { 
 	VAR *p=FindVAR($4);
 	ASSERT((p==NULL),"base de dados ja foi carregada");
 	AddVAR($4,FLT);
@@ -122,6 +124,19 @@ commands : /* empty */
 | command ';' /*{ fprintf(output, ";\n"); }*/ commands
 ;
 command : SKIP
+| ESCALONAR {
+	fprintf(output, "\n#----------Escalonando os atributos -----------#\nfrom sklearn.preprocessing import StandardScaler\nscaler = StandardScaler()\nprevisores = scaler.fit_transform(previsores)\n");
+}
+| DIVISAO { fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\nfrom sklearn.model_selection import train_test_split\nporcentagem_divisao = "); } exp {
+	fprintf(output, "\nprevisores_treinamento, previsores_teste, classe_treinamento, classe_teste = train_test_split(\n    previsores, classe, test_size=porcentagem_divisao\n)\n");
+}
+| TREINAMENTO {
+	fprintf(output, "\n#---------- Treinando o modelo -----------#\nmodelo.fit(previsores_treinamento, classe_treinamento)\n");
+}
+| PREDICAO {
+	fprintf(output, "\n#---------- Fazendo as predições -----------#\nprevisoes = modelo.predict(previsores_teste)\n");
+}
+| RESULTADO resultados {}
 | READ IDENTIFIER {
 	VAR *p=FindVAR($2);//procura o conteúdo de 2
 	ASSERT( (p!=NULL),"Identificador Não declarado");//se achou p != nulo
@@ -157,22 +172,21 @@ command : SKIP
 | {fprintf(output,"if");} IF exp {fprintf(output,"{\n");} THEN commands FI {fprintf(output,"}\n");} {//S2 é o retorno de tudão da expressão
 	ASSERT( $3 == BOOL, "Valor boleano esperado");
 }
-| WHILE exp DO commands END { ASSERT( $2 == BOOL, "Valor boleano esperado"); }
 ;
 
-function_return: /* empty */
-| RETURN {fprintf(output, "return ");} exp {fprintf(output, ";\n");} ';' { /* printf(" Retornando variável: %d", $2); */ }
+resultados: ACURACIA {
+	fprintf(output, "\n#---------- Checando a pricisão ----------#\nfrom sklearn.metrics import accuracy_score\nprecisao = accuracy_score(classe_teste, previsoes)\n");
+}
 ;
 
 inicio_function: /* empty */
 | FUNCTION declaration_function { global_scope=1; fprintf(output, "(");} '(' parametros_function ')' {fprintf(output, ")");} {fprintf(output, "{\n");} exp_function ';' { fprintf(output, "}"); DestruirVAR(); global_scope=0; }
 ;//ao trocar global_scope para 1 a partir desse momento todas as variáveis serão add dentro do scopo 1 :)
 
-exp_function: LET declarations IN commands function_return END //expressores dentro do escopo da função
+exp_function: LET declarations IN commands END //expressores dentro do escopo da função
 ;
 
-exp : NUMBL   /*{ $$= BOOL;fprintf(output, "%d", $1);}*/
-| NUMINT      { $$= INT; fprintf(output, "%d", $1);}
+exp : NUMINT  { $$= INT; fprintf(output, "%d", $1);}
 | NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
 | IDENTIFIER  {// a única coisa guardada na tabela de simbolos
 	VAR *p=FindVAR($1);
@@ -180,10 +194,6 @@ exp : NUMBL   /*{ $$= BOOL;fprintf(output, "%d", $1);}*/
 	ASSERT((p!=NULL),"Identificador Não declarado");
 	$$= (p!=NULL)? p->type:UNDECL;
 	fprintf(output, "%s", $1);
-}
-| exp MAIORIGUAL {fprintf(output," >= ");}  exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	$$= BOOL; 
 }
 | '(' {fprintf(output,"(");} exp ')' {fprintf(output,")");}  { $$= $3;}
 | IDENTIFIER '(' params ')' {// pode chamar função também f(paramns)

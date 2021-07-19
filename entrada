@@ -1,23 +1,12 @@
 let
-	float j, i, n;
-	integer myFistInteiro;
+	carrega base credit_data classe 4 previsores 1;
 
-	function float media(float zi, bool b, integer x) 
-	 let
-	   float z, v, hg, g;
-	 in
-	  z:= 2;
-      return z;
-	end;
 in
-	j:=0.5;
-
-	if (myFistInteiro = 2) then
-	    myFistInteiro:= myFistInteiro + 1;
-	fi;
-
-	n:=3+j;
-
-	read myFistInteiro;
-	write myFistInteiro;
+	escalonar previsores;
+	divisao 0.25;
+	classificador randomforest 40 base
+	treinamento base;
+	predicao base;
+	resultado acuracia;
+	
 end

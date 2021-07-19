@@ -10,11 +10,10 @@ ID       [_a-zA-Z][_A-Za-z0-9]*
 %%
 
 ":="     { printf("Atribuição "); return(ASSGNOP);  }
-">="     { printf(">= "); return(MAIORIGUAL);  }
 {DIGIT}+ { printf("Inteiro "); yylval.yint = atoi(yytext);  return(NUMINT);   }
 [-+]?{DIGIT}*"."{DIGIT}+ { printf("Real "); yylval.yflt = atof(yytext); return(NUMFLT);   }
-true|false { printf("Booleano "); return(NUMBL); }
-do       { printf("do "); return(DO);       }
+
+
 end      { printf("end "); return(END);      }
 fi       { printf("fi "); return(FI);       }
 if       { printf("if "); return(IF);       }
@@ -22,13 +21,18 @@ in       { printf("in ");  return(IN);       }
 integer  { printf("tipo "); return(INTEGER);  }
 float    { printf("tipo "); return(FLOAT);  }
 carrega  { printf("carrega "); return(CARREGA); }
+divisao { printf("divisão "); return(DIVISAO); }
+escalonar { printf("escalonar "); return(ESCALONAR); }
+transformar { printf("transformar "); return(TRANSFORMAR); }
+treinamento { printf("treinamento "); return(TREINAMENTO); }
+predicao { printf("predição "); return(PREDICAO); }
+resultado { printf("resultado "); return(RESULTADO); }
+acuracia { printf("acurácia "); return(ACURACIA); }
 function { printf("function "); return(FUNCTION); }
 let      { printf("let "); return(LET);      }
 read     { printf("read "); return(READ);     }
 skip     { printf("skip "); return(SKIP);     }
-return   { printf("retorno "); return(RETURN);     }
 then     { printf("then ");return(THEN);     }
-while    { printf("while ");return(WHILE);    }
 write    { printf("write "); return(WRITE);    }
 {ID}     { printf("Identificador "); yylval.ystr = stringpool(yytext);  return(IDENTIFIER); }
 "\n"     { printf("\n");}
