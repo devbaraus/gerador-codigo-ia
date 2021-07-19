@@ -79,10 +79,10 @@ declarations : /* empty */
 	ASSERT((p==NULL),"Identificador já declarado+");
 	AddVAR($4,FLT);
 }
-| CARREGA { fprintf(output, "base "); } id_seq_float IDENTIFIER { fprintf(output, "= pd.read_csv('%s.csv')", $4); } ';' { fprintf(output, "; \n"); } declarations { 
+| CARREGA { fprintf(output, "import pandas as pd\nbase "); } id_seq_float IDENTIFIER { fprintf(output, "= pd.read_csv('%s.csv')", $4); } ';' { fprintf(output, "; \n"); } declarations { 
 	//fprintf(output, "base = pd.read_csv('%s')", $2);
-	VAR *p=ChecarEscopo1($4);
-	ASSERT((p==NULL),"Identificador já declarado+");
+	VAR *p=FindVAR($4);
+	ASSERT((p==NULL),"base de dados ja foi carregada");
 	AddVAR($4,FLT);
 }
 | inicio_function id_seq_function // pode declarar 1 ou mais funções
