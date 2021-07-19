@@ -26,12 +26,12 @@ FILE * output;
 %token LET IN
 %token INTEGER
 %token FLOAT
-%token SKIP IF THEN ELSE END WHILE DO READ WRITE FI RETURN
+%token SKIP IF THEN END WHILE DO READ WRITE FI RETURN
 %token <yint> NUMINT // antes era NUMBER agora subistitui
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER
 %token NUMBL
-%token BOOLEAN FUNCTION
+%token BOOLEAN FUNCTION CARREGA
 %token ASSGNOP MAIORIGUAL
 %left '>' '<' '=' MAIORIGUAL
 %left '-' '+'
@@ -57,12 +57,6 @@ declaration_function : /* empty */
 	AddVAR($2,FLT);
 	fprintf(output, "float %s", $2);
 }
-| BOOLEAN IDENTIFIER { 
-	VAR *p=FindVAR($2);
-	ASSERT((p==NULL),"Identificador já declarado");
-	AddVAR($2,BOOL);
-	fprintf(output, "bool %s", $2);
-}
 ;
 parametros_function: /* empty */
 | INTEGER IDENTIFIER {fprintf(output,"int %s", $2); AddVAR($2,INT);} id_param_functions
@@ -84,7 +78,13 @@ declarations : /* empty */
 	VAR *p=ChecarEscopo1($4);
 	ASSERT((p==NULL),"Identificador já declarado+");
 	AddVAR($4,FLT);
-}// ao declarar uma variavel add na tabela de simbolos
+}
+| CARREGA { fprintf(output, "base "); } id_seq_float IDENTIFIER { fprintf(output, "= pd.read_csv('%s.csv')", $4); } ';' { fprintf(output, "; \n"); } declarations { 
+	//fprintf(output, "base = pd.read_csv('%s')", $2);
+	VAR *p=ChecarEscopo1($4);
+	ASSERT((p==NULL),"Identificador já declarado+");
+	AddVAR($4,FLT);
+}
 | inicio_function id_seq_function // pode declarar 1 ou mais funções
 ;
 id_seq_int : /* empty */
@@ -157,8 +157,6 @@ command : SKIP
 | {fprintf(output,"if");} IF exp {fprintf(output,"{\n");} THEN commands FI {fprintf(output,"}\n");} {//S2 é o retorno de tudão da expressão
 	ASSERT( $3 == BOOL, "Valor boleano esperado");
 }
-//| IF {fprintf(output,"if");} exp {fprintf(output,"){\n");} THEN commands {fprintf(output,"\n}\n");} FI {//S2 é o retorno de tudão da expressão
-//| IF exp THEN commands ELSE commands FI { ASSERT( $2 == BOOL, "Valor boleano esperado"); }
 | WHILE exp DO commands END { ASSERT( $2 == BOOL, "Valor boleano esperado"); }
 ;
 
@@ -173,7 +171,7 @@ inicio_function: /* empty */
 exp_function: LET declarations IN commands function_return END //expressores dentro do escopo da função
 ;
 
-exp : NUMBL   { $$= BOOL; /*printf("2° ~> $$: %d] ",$$);*/}
+exp : NUMBL   /*{ $$= BOOL;fprintf(output, "%d", $1);}*/
 | NUMINT      { $$= INT; fprintf(output, "%d", $1);}
 | NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
 | IDENTIFIER  {// a única coisa guardada na tabela de simbolos
@@ -187,43 +185,6 @@ exp : NUMBL   { $$= BOOL; /*printf("2° ~> $$: %d] ",$$);*/}
 	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
 	$$= BOOL; 
 }
-| exp '<' {fprintf(output," < ");}  exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	$$= BOOL; 
-}
-| exp '=' {fprintf(output," == ");} exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	$$= BOOL; 
-}
-| exp '>' {fprintf(output," > ");} exp { 
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	$$= BOOL; 
-}
-| exp '+' {fprintf(output," + ");} exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	if($1 == FLT | $4 == FLT) $$ = FLT;
-	else $$ = INT;
-}
-| exp '-'{fprintf(output," - ");}  exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	if($1 == FLT | $4 == FLT) $$ = FLT;
-	else $$ = INT;
-}
-| exp '*' {fprintf(output," * ");}  exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	if($1 == FLT | $4 == FLT) $$ = FLT;
-	else $$ = INT;
-}
-| exp '/' {fprintf(output," / ");} exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	if($1 == FLT | $4 == FLT) $$ = FLT;
-	else $$ = INT;
-}
-| exp '^' {fprintf(output,"^");} exp {
-	ASSERT( (($1 == INT || $1 == FLT) && ($4 == INT || $4 == FLT)) , "Operadores imcompatível");
-	if($1 == FLT | $4 == FLT) $$ = FLT;
-	else $$ = INT;
-}
 | '(' {fprintf(output,"(");} exp ')' {fprintf(output,")");}  { $$= $3;}
 | IDENTIFIER '(' params ')' {// pode chamar função também f(paramns)
 	VAR *p=FindVAR($1);//pegando tipo da função
@@ -236,7 +197,7 @@ exp : NUMBL   { $$= BOOL; /*printf("2° ~> $$: %d] ",$$);*/}
 
 
 main( int argc, char *argv[] ) {
-	output = fopen("output.c","w");
+	output = fopen("output.py","w");
 	init_stringpool(10000); //memória que vai guardar as strings
 	if ( yyparse () == 0) printf("codigo sem erros");
 }

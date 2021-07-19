@@ -15,14 +15,13 @@ ID       [_a-zA-Z][_A-Za-z0-9]*
 [-+]?{DIGIT}*"."{DIGIT}+ { printf("Real "); yylval.yflt = atof(yytext); return(NUMFLT);   }
 true|false { printf("Booleano "); return(NUMBL); }
 do       { printf("do "); return(DO);       }
-else     { printf("else "); return(ELSE);     }
 end      { printf("end "); return(END);      }
 fi       { printf("fi "); return(FI);       }
 if       { printf("if "); return(IF);       }
 in       { printf("in ");  return(IN);       }
 integer  { printf("tipo "); return(INTEGER);  }
 float    { printf("tipo "); return(FLOAT);  }
-bool     { printf("tipo "); return BOOLEAN;  }
+carrega  { printf("carrega "); return(CARREGA); }
 function { printf("function "); return(FUNCTION); }
 let      { printf("let "); return(LET);      }
 read     { printf("read "); return(READ);     }
