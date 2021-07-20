@@ -10,6 +10,7 @@ FILE * output;
 #define INT     1
 #define BOOL    2
 #define FLT     3
+#define IMPORTDATABASE 111111 //usado para saber se ja foi add um import do pandas
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 %}
@@ -21,6 +22,64 @@ FILE * output;
 	int   yint;// 1
 	float yflt;
 }
+
+%{
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;
+
+void addImport(struct node **head, int val) {
+    //create a new node
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->data = val;
+    newNode->next = NULL;
+
+	//if head is NULL, it is an empty list
+    if(*head == NULL) {
+        *head = newNode;
+	}
+    else {//Otherwise, find the last node and add the newNode
+        struct node *lastNode = *head;
+
+        //last node's next address will be NULL.
+        while(lastNode->next != NULL) {
+            lastNode = lastNode->next;
+        }
+        //add the newNode at the end of the linked list
+        lastNode->next = newNode;
+    }
+}
+
+void printList(struct node *head) {
+    struct node *temp = head;
+    //iterate the entire linked list and print the data
+    while(temp != NULL) {
+        printf("%d->", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int encontreImport(struct node *head, int key) {
+    struct node *temp = head;
+    //iterate the entire linked list and print the data
+    while(temp != NULL) {
+         //key found return 1.
+         if(temp->data == key)
+             return 1;
+         temp = temp->next;
+    }
+    //key not found
+    return -1;
+}
+
+%}
+
 
 %start program
 %token SKIP IF THEN READ WRITE FI
@@ -44,8 +103,11 @@ commands : /* empty */
 | command ';' /*{ fprintf(output, ";\n"); }*/ commands
 ;
 command : SKIP
-| CARREGA { 
-	fprintf(output, "import pandas as pd\n");
+| CARREGA {//verifica se ja add o import no código
+	if(encontreImport(head, IMPORTDATABASE) == -1){
+		addImport(&head, IMPORTDATABASE);
+		fprintf(output, "import pandas as pd\n");
+	}
   }
   IDENTIFIER {
 	VAR *p=FindVAR($3);
@@ -62,7 +124,6 @@ command : SKIP
   {
 	VAR *p=FindVAR($3);/*buscando o nome da variável que guardou a base para concatenar com o nome das
 	                     variáveis que serão geradas no python*/
-	//fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\ninicio_previsores = None\n#Substituir a linha abaixo pelo numero da coluna classe\ncoluna_classe = None\n\nprevisores = base.iloc[:, inicio_previsores:coluna_classe].values\nclasse = base.iloc[:, coluna_classe].values\n\n"); 
 	fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\n");
 	fprintf(output, "inicio_previsores_%s = 0\n", p->name);
 	fprintf(output, "#Substituir a linha abaixo pelo numero da coluna classe\n");

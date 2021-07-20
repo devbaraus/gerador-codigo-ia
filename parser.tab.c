@@ -75,10 +75,11 @@ FILE * output;
 #define INT     1
 #define BOOL    2
 #define FLT     3
+#define IMPORTDATABASE 111111 //usado para saber se ja foi add um import do pandas
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 
-#line 82 "parser.tab.c" /* yacc.c:339  */
+#line 83 "parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -139,13 +140,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 19 "parser.y" /* yacc.c:355  */
+#line 20 "parser.y" /* yacc.c:355  */
 
 	char * ystr;
 	int   yint;// 1
 	float yflt;
 
-#line 149 "parser.tab.c" /* yacc.c:355  */
+#line 150 "parser.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -161,8 +162,64 @@ int yyparse (void);
 #endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
+#line 26 "parser.y" /* yacc.c:358  */
 
-#line 166 "parser.tab.c" /* yacc.c:358  */
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;
+
+void addLast(struct node **head, int val) {
+    //create a new node
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->data = val;
+    newNode->next = NULL;
+
+	//if head is NULL, it is an empty list
+    if(*head == NULL) {
+        *head = newNode;
+	}
+    else {//Otherwise, find the last node and add the newNode
+        struct node *lastNode = *head;
+
+        //last node's next address will be NULL.
+        while(lastNode->next != NULL) {
+            lastNode = lastNode->next;
+        }
+        //add the newNode at the end of the linked list
+        lastNode->next = newNode;
+    }
+}
+
+void printList(struct node *head) {
+    struct node *temp = head;
+    //iterate the entire linked list and print the data
+    while(temp != NULL) {
+        printf("%d->", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int searchNode(struct node *head, int key) {
+    struct node *temp = head;
+    //iterate the entire linked list and print the data
+    while(temp != NULL) {
+         //key found return 1.
+         if(temp->data == key)
+             return 1;
+         temp = temp->next;
+    }
+    //key not found
+    return -1;
+}
+
+
+#line 223 "parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -461,10 +518,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    40,    40,    43,    44,    46,    47,    50,    59,    47,
-      73,    76,    76,    79,    82,    85,    86,    96,   112,   112,
-     118,   118,   118,   118,   123,   128,   129,   130,   137,   137,
-     137
+       0,    99,    99,   102,   103,   105,   106,   112,   121,   106,
+     134,   137,   137,   140,   143,   146,   147,   157,   173,   173,
+     179,   179,   179,   179,   184,   189,   190,   191,   198,   198,
+     198
 };
 #endif
 
@@ -1264,21 +1321,24 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 40 "parser.y" /* yacc.c:1646  */
+#line 99 "parser.y" /* yacc.c:1646  */
     { }
-#line 1270 "parser.tab.c" /* yacc.c:1646  */
+#line 1327 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 47 "parser.y" /* yacc.c:1646  */
-    { 
-	fprintf(output, "import pandas as pd\n");
+#line 106 "parser.y" /* yacc.c:1646  */
+    {//verifica se ja add o import no código
+	if(searchNode(head, IMPORTDATABASE) == -1){
+		addLast(&head, IMPORTDATABASE);
+		fprintf(output, "import pandas as pd\n");
+	}
   }
-#line 1278 "parser.tab.c" /* yacc.c:1646  */
+#line 1338 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 50 "parser.y" /* yacc.c:1646  */
+#line 112 "parser.y" /* yacc.c:1646  */
     {
 	VAR *p=FindVAR((yyvsp[0].ystr));
 	if(p==NULL){//verifica se a base ainda não foi adicionada
@@ -1288,23 +1348,22 @@ yyreduce:
 		printf("base de dados ja foi carregada");
 	}
   }
-#line 1292 "parser.tab.c" /* yacc.c:1646  */
+#line 1352 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 59 "parser.y" /* yacc.c:1646  */
+#line 121 "parser.y" /* yacc.c:1646  */
     { //pegando o nome da base.csv
 		fprintf(output, "%s = pd.read_csv('%s.csv')", (yyvsp[-2].ystr), (yyvsp[0].ystr));
   }
-#line 1300 "parser.tab.c" /* yacc.c:1646  */
+#line 1360 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 62 "parser.y" /* yacc.c:1646  */
+#line 124 "parser.y" /* yacc.c:1646  */
     {
 	VAR *p=FindVAR((yyvsp[-3].ystr));/*buscando o nome da variável que guardou a base para concatenar com o nome das
 	                     variáveis que serão geradas no python*/
-	//fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\ninicio_previsores = None\n#Substituir a linha abaixo pelo numero da coluna classe\ncoluna_classe = None\n\nprevisores = base.iloc[:, inicio_previsores:coluna_classe].values\nclasse = base.iloc[:, coluna_classe].values\n\n"); 
 	fprintf(output, "\n\n#Substituir a linha abaixo pela coluna de inicio dos atributos previsores\n");
 	fprintf(output, "inicio_previsores_%s = 0\n", p->name);
 	fprintf(output, "#Substituir a linha abaixo pelo numero da coluna classe\n");
@@ -1312,55 +1371,55 @@ yyreduce:
 	fprintf(output, "previsores_%s = %s.iloc[:, inicio_previsores_%s:coluna_classe_%s].values\n", p->name, p->name, p->name, p->name);
 	fprintf(output, "classe_%s = %s.iloc[:, coluna_classe_%s].values\n\n",p->name, p->name, p->name);
 }
-#line 1316 "parser.tab.c" /* yacc.c:1646  */
+#line 1375 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 73 "parser.y" /* yacc.c:1646  */
+#line 134 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "\n#----------Escalonando os atributos -----------#\nfrom sklearn.preprocessing import StandardScaler\nscaler = StandardScaler()\nprevisores = scaler.fit_transform(previsores)\n");
 }
-#line 1324 "parser.tab.c" /* yacc.c:1646  */
+#line 1383 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 76 "parser.y" /* yacc.c:1646  */
+#line 137 "parser.y" /* yacc.c:1646  */
     { fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\nfrom sklearn.model_selection import train_test_split\nporcentagem_divisao = "); }
-#line 1330 "parser.tab.c" /* yacc.c:1646  */
+#line 1389 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 76 "parser.y" /* yacc.c:1646  */
+#line 137 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "\nprevisores_treinamento, previsores_teste, classe_treinamento, classe_teste = train_test_split(\n    previsores, classe, test_size=porcentagem_divisao\n)\n");
 }
-#line 1338 "parser.tab.c" /* yacc.c:1646  */
+#line 1397 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 79 "parser.y" /* yacc.c:1646  */
+#line 140 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "\n#---------- Treinando o modelo -----------#\nmodelo.fit(previsores_treinamento, classe_treinamento)\n");
 }
-#line 1346 "parser.tab.c" /* yacc.c:1646  */
+#line 1405 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 82 "parser.y" /* yacc.c:1646  */
+#line 143 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "\n#---------- Fazendo as predições -----------#\nprevisoes = modelo.predict(previsores_teste)\n");
 }
-#line 1354 "parser.tab.c" /* yacc.c:1646  */
+#line 1413 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 85 "parser.y" /* yacc.c:1646  */
+#line 146 "parser.y" /* yacc.c:1646  */
     {}
-#line 1360 "parser.tab.c" /* yacc.c:1646  */
+#line 1419 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 86 "parser.y" /* yacc.c:1646  */
+#line 147 "parser.y" /* yacc.c:1646  */
     {
 	VAR *p=FindVAR((yyvsp[0].ystr));//procura o conteúdo de 2
 	ASSERT( (p!=NULL),"Identificador Não declarado");//se achou p != nulo
@@ -1371,11 +1430,11 @@ yyreduce:
 		fprintf(output, "scanf(\"%%d\", %s); \n", (yyvsp[0].ystr));
 	}
 }
-#line 1375 "parser.tab.c" /* yacc.c:1646  */
+#line 1434 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 96 "parser.y" /* yacc.c:1646  */
+#line 157 "parser.y" /* yacc.c:1646  */
     {
 	VAR *p=FindVAR((yyvsp[0].ystr));//procura o conteúdo de 2
 
@@ -1392,74 +1451,74 @@ yyreduce:
 		fprintf(output, "printf(\"%s\");\n", (yyvsp[0].ystr));
 	}
 }
-#line 1396 "parser.tab.c" /* yacc.c:1646  */
+#line 1455 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 112 "parser.y" /* yacc.c:1646  */
+#line 173 "parser.y" /* yacc.c:1646  */
     { fprintf(output, "%s = ", (yyvsp[-1].ystr)); }
-#line 1402 "parser.tab.c" /* yacc.c:1646  */
+#line 1461 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 112 "parser.y" /* yacc.c:1646  */
+#line 173 "parser.y" /* yacc.c:1646  */
     { 
 	VAR *p=FindVAR((yyvsp[-3].ystr));
 	ASSERT((p!=NULL),"Identificador Não declarado/");
 	ASSERT( (p->type == INT && (yyvsp[0].yint) == INT) || (p->type == FLT && ((yyvsp[0].yint) == INT || (yyvsp[0].yint) == FLT) ), " Tipo incompatível de dados");
 	fprintf(output, ";\n");
 }
-#line 1413 "parser.tab.c" /* yacc.c:1646  */
+#line 1472 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 118 "parser.y" /* yacc.c:1646  */
+#line 179 "parser.y" /* yacc.c:1646  */
     {fprintf(output,"if");}
-#line 1419 "parser.tab.c" /* yacc.c:1646  */
+#line 1478 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 118 "parser.y" /* yacc.c:1646  */
+#line 179 "parser.y" /* yacc.c:1646  */
     {fprintf(output,"{\n");}
-#line 1425 "parser.tab.c" /* yacc.c:1646  */
+#line 1484 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 118 "parser.y" /* yacc.c:1646  */
+#line 179 "parser.y" /* yacc.c:1646  */
     {fprintf(output,"}\n");}
-#line 1431 "parser.tab.c" /* yacc.c:1646  */
+#line 1490 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 118 "parser.y" /* yacc.c:1646  */
+#line 179 "parser.y" /* yacc.c:1646  */
     {//S2 é o retorno de tudão da expressão
 	ASSERT( (yyvsp[-5].yint) == BOOL, "Valor boleano esperado");
 }
-#line 1439 "parser.tab.c" /* yacc.c:1646  */
+#line 1498 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 123 "parser.y" /* yacc.c:1646  */
+#line 184 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "\n#---------- Checando a pricisão ----------#\nfrom sklearn.metrics import accuracy_score\nprecisao = accuracy_score(classe_teste, previsoes)\n");
 }
-#line 1447 "parser.tab.c" /* yacc.c:1646  */
+#line 1506 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 128 "parser.y" /* yacc.c:1646  */
+#line 189 "parser.y" /* yacc.c:1646  */
     { (yyval.yint)= INT; fprintf(output, "%d", (yyvsp[0].yint));}
-#line 1453 "parser.tab.c" /* yacc.c:1646  */
+#line 1512 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 129 "parser.y" /* yacc.c:1646  */
+#line 190 "parser.y" /* yacc.c:1646  */
     { (yyval.yint)= FLT; fprintf(output, "%f", (yyvsp[0].yflt));}
-#line 1459 "parser.tab.c" /* yacc.c:1646  */
+#line 1518 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 130 "parser.y" /* yacc.c:1646  */
+#line 191 "parser.y" /* yacc.c:1646  */
     {// a única coisa guardada na tabela de simbolos
 	VAR *p=FindVAR((yyvsp[0].ystr));
 	//printf(" Salvando variável no scopo: -> %d <- ", global_scope);
@@ -1467,29 +1526,29 @@ yyreduce:
 	(yyval.yint)= (p!=NULL)? p->type:UNDECL;
 	fprintf(output, "%s", (yyvsp[0].ystr));
 }
-#line 1471 "parser.tab.c" /* yacc.c:1646  */
+#line 1530 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 137 "parser.y" /* yacc.c:1646  */
+#line 198 "parser.y" /* yacc.c:1646  */
     {fprintf(output,"(");}
-#line 1477 "parser.tab.c" /* yacc.c:1646  */
+#line 1536 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 137 "parser.y" /* yacc.c:1646  */
+#line 198 "parser.y" /* yacc.c:1646  */
     {fprintf(output,")");}
-#line 1483 "parser.tab.c" /* yacc.c:1646  */
+#line 1542 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 137 "parser.y" /* yacc.c:1646  */
+#line 198 "parser.y" /* yacc.c:1646  */
     { (yyval.yint)= (yyvsp[-2].yint);}
-#line 1489 "parser.tab.c" /* yacc.c:1646  */
+#line 1548 "parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1493 "parser.tab.c" /* yacc.c:1646  */
+#line 1552 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1717,7 +1776,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 140 "parser.y" /* yacc.c:1906  */
+#line 201 "parser.y" /* yacc.c:1906  */
 
 
 
