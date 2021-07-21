@@ -35,63 +35,6 @@ VAR *FindVAR(char *name) {
 	return p;
 }
 
-VAR *ChecarEscopo1(char *name) {
-	VAR *p = SymTab;
-	//printf("\nTo procurando por: %s", name);
-
-	while( (p != NULL) && (p->name != name) ) {
-		//printf("\n [nome: %s, scopo: %d] ",p->name, p->scope);
-		p = p->next;
-	}
-
-	if (p!=NULL) {//se encontrou, checar se é do scopo 1 ou 0
-		//printf("\nEstou retornando:  { nome: %s, scope: %d }   scopo_global: %d ",p->name,p->scope, global_scope);
-		if((p->scope != 1)){//se a variavel que encontrou for diferente do escopo 1
-			p = NULL;//então retorna nulo
-			//printf("Entrou aqui ");
-		}
-	}
-
-	return p;
-}
-
-VAR *DestruirVAR() {
-	VAR *atual = SymTab;
-	VAR *proximo = NULL;
-
-	while(atual != NULL) {
-		//printf("\n [nome: %s, scopo: %d] ",atual->name, atual->scope);
-		escopo1Destruido = 0;
-
-		if (atual->next != NULL) {//se tiver um próximo...
-			proximo = atual->next;//pegue o próximo
-			// if(atual->scope == 1){//se começar por um ponteiro de escopo 1
-			// 	printf("*p: %s, scope: %d ~> %s ",atual->name,atual->scope,proximo->name);
-			// 	printf("O atual era: ~>> %s ", atual->name);
-			// 	aux = atual->next;
-			// 	free(atual);//liberando o atual
-			// 	atual = aux;//atual se torna o proximo
-			// 	printf("Agora o atual é: ~>> %s", atual->name);
-			// 	escopo1Destruido = 1;
-			// }
-
-			if (proximo->scope == 1) {
-				//printf(" proximo liberado: %d ", atual->next);
-				atual->next = NULL;
-				atual->next = proximo->next;//proximo do atual recebe o proximo do proximo
-				free(proximo);//liberar o proximo ponteiro
-				proximo = NULL;
-				//printf("Liberando memória do ponteiro: %d, proximo: %d, var: %s, scopo: %d", atual,atual->next,atual->name, atual->scope);
-				escopo1Destruido = 1;
-			}
-		}
-		if (escopo1Destruido == 0){//só se não destruiu o proximo do escopo 1
-			atual = atual->next;
-		}
-	}
-	//return atual;
-}
-
 /* Simple string table manager for use with symbol table */
 void init_stringpool(int strs) {
 	if ( strs <= 0 ) return;
