@@ -1,5 +1,6 @@
-carrega base1 credit_data;
-carrega base2 risco_credito;
+carrega base1 credit_data 6 1;
+carrega base2 risco_credito 7;
+
 
 escalonar base1 previsores;
 divisao 0.25;
