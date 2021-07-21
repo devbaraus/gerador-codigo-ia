@@ -14,27 +14,20 @@ ID       [_a-zA-Z][_A-Za-z0-9]*
 [-+]?{DIGIT}*"."{DIGIT}+ { printf("Real "); yylval.yflt = atof(yytext); return(NUMFLT);   }
 
 
-
-fi       { printf("fi "); return(FI);       }
-if       { printf("if "); return(IF);       }
 carrega  { printf("carrega "); return(CARREGA); }
 divisao { printf("divisão "); return(DIVISAO); }
 escalonar { printf("escalonar "); return(ESCALONAR); }
 transformar { printf("transformar "); return(TRANSFORMAR); }
 treinamento { printf("treinamento "); return(TREINAMENTO); }
 predicao { printf("predição "); return(PREDICAO); }
+faltantes { printf("faltantes "); return(FALTANTES); }
 resultado { printf("resultado "); return(RESULTADO); }
 acuracia { printf("acurácia "); return(ACURACIA); }
-read     { printf("read "); return(READ);     }
-skip     { printf("skip "); return(SKIP);     }
-then     { printf("then ");return(THEN);     }
-write    { printf("write "); return(WRITE);    }
 {ID}     { printf("Identificador "); yylval.ystr = stringpool(yytext);  return(IDENTIFIER); }
+-{ID}={DIGIT} { printf("parâmetro "); yylval.ystr = stringpool(yytext); return(PARAMETRO); }
 "\n"     { printf("\n");}
 "//"[A-Za-z0-9_ ]* {printf("Comentário"); }
 [ \t]+ /* blank, tab, new line: eat up whitespace */
 .        { printf("%c",yytext[0]); return(yytext[0]); }
 
 %%
-
-
