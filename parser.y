@@ -198,7 +198,6 @@ command : CARREGA {//verifica se ja add o import no código
 				  //estratégia média é escolhida por padrão então...
 				  fprintf(output, "estrategia = \"mean\"\n");
 			  }
-			  //fprintf(output, "estrategia = \"%s\"\n", string);
 			  fprintf(output, "imputer = SimpleImputer(missing_values = np.nan, strategy = estrategia)\n");
 		  }
 		  else{//se nao passou a estratégia, salvar como padrão.
@@ -207,9 +206,10 @@ command : CARREGA {//verifica se ja add o import no código
 		  fprintf(output, "imputer = imputer.fit(previsores_%s[:, inicio_previsores_%s:coluna_classe_%s])\n",p->name,p->name,p->name);
 		  fprintf(
 			  output,
-			  "previsores_%s[:, inicio_previsores_%s:coluna_classe_%s] = imputer.transform(previsores_%s[:, inicio_previsores_%s:coluna_classe_%s])\n\n\n"
-			  ,p->name,p->name,p->name,p->name,p->name,p->name
+			  "previsores_%s[:, inicio_previsores_%s:coluna_classe_%s] = imputer.transform(\n",p->name,p->name,p->name
 		  );
+		  fprintf(output, "    previsores_%s[:, inicio_previsores_%s:coluna_classe_%s]\n)\n\n\n",p->name,p->name,p->name);
+
 
 	  }
 	  else{
