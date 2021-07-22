@@ -177,9 +177,28 @@ command : CARREGA {//verifica se ja add o import no código
 	  VAR *p=FindVAR($3);//checar se a base declarada existe...
 	  if(p!=NULL){//se passou qual é a estratégia
 		  //printf(" ~>%s<~",estrategia->name);
-		  if($4 != UNDECL) {// se não passou o parâmetro
-				fprintf(output, "estrategia = \"%s\"\n", $4);
-				fprintf(output, "imputer = SimpleImputer(missing_values = np.nan, strategy = estrategia)\n");
+		  if($4 != UNDECL) {// se passou o parâmetro da estratégia...
+			  VAR *t=FindVAR($4);
+			  int teste1 = strcmp(t->name,"media");
+			  int teste2 = strcmp(t->name,"mediana");
+			  int teste3 = strcmp(t->name,"mais_frequente");
+			  char *string="";
+			  if(teste1 == 0){
+				  fprintf(output, "estrategia = \"mean\"\n");
+			  }
+			  else if (teste2 == 0){
+				  fprintf(output, "estrategia = \"median\"\n");
+			  }
+			  else if (teste3 == 0){
+				  fprintf(output, "estrategia = \"most_frequent\"\n");
+			  }
+			  else{
+				  printf("--  Estratégia não reconhecida --");
+				  //estratégia média é escolhida por padrão então...
+				  fprintf(output, "estrategia = \"mean\"\n");
+			  }
+			  //fprintf(output, "estrategia = \"%s\"\n", string);
+			  fprintf(output, "imputer = SimpleImputer(missing_values = np.nan, strategy = estrategia)\n");
 		  }
 		  else{//se nao passou a estratégia, salvar como padrão.
 			  fprintf(output, "imputer = SimpleImputer(missing_values = np.nan)\n");
