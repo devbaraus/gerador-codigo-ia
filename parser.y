@@ -15,6 +15,7 @@ FILE * output;
 #define IMPORTIMPUTER      121212
 #define IMPORTSCALER       555555
 #define IMPORTLABELENCODER 222222
+#define IMPORTDIVISAO      333333
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 %}
@@ -258,8 +259,20 @@ command : CARREGA {//verifica se ja add o import no código
 	fprintf(output,"\n\n");
 	
 }
-| DIVISAO { fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\nfrom sklearn.model_selection import train_test_split\nporcentagem_divisao = "); } exp {
-	fprintf(output, "\nprevisores_treinamento, previsores_teste, classe_treinamento, classe_teste = train_test_split(\n    previsores, classe, test_size=porcentagem_divisao\n)\n");
+| DIVISAO IDENTIFIER NUMINT { 
+	fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\n");
+	if(encontreImport(head, IMPORTDIVISAO) == -1){
+		addImport(&head, IMPORTDIVISAO);
+		fprintf(output, "from sklearn.model_selection import train_test_split\n");
+	}
+	fprintf(output, "porcentagem_divisao = 0.%d\n", $3);
+	VAR *p=FindVAR($2);
+	fprintf(
+		output,
+		"previsores_treinamento_%s, previsores_teste_%s, classe_treinamento_%s, classe_teste_%s = train_test_split(\n"
+		,p->name,p->name,p->name,p->name
+	);
+	fprintf(output, "    previsores_%s, classe_%s, test_size=porcentagem_divisao\n)\n",p->name, p->name);
 }
 | TREINAMENTO {
 	fprintf(output, "\n#---------- Treinando o modelo -----------#\nmodelo.fit(previsores_treinamento, classe_treinamento)\n");
