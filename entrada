@@ -1,10 +1,11 @@
 carrega base1 credit_data 6 1;
 carrega base2 risco_credito 7;
 faltantes base1 mean;
+faltantes base2;
+escalonar base1;
 
 
-escalonar base1 previsores;
-divisao 0.25;
+divisao base1 0.25;
 classificador randomforest 40 base;
 treinamento base;
 predicao base;

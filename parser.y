@@ -12,6 +12,7 @@ FILE * output;
 #define FLT     3
 #define IMPORTDATABASE 111111 //usado para saber se ja foi add um import do pandas
 #define IMPORTIMPUTER  121212
+#define IMPORTSCALER   555555
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 %}
@@ -153,9 +154,9 @@ command : CARREGA {//verifica se ja add o import no código
 	   fprintf(output, "classe_%s = %s.iloc[:, coluna_classe_%s].values\n\n\n",p->name, p->name, p->name);
 }
 | FALTANTES {
+	fprintf(output, "#-------- Tratando os valores faltantes -----------#\n");
 	if(encontreImport(head, IMPORTIMPUTER) == -1){
 		addImport(&head, IMPORTIMPUTER);
-		fprintf(output, "#-------- Tratando os valores faltantes -----------#\n");
 		fprintf(output, "from sklearn.impute import SimpleImputer\n");
 		fprintf(output,"import numpy as np\n");
 	}
@@ -183,8 +184,17 @@ command : CARREGA {//verifica se ja add o import no código
 		  printf("Base de dados não existe");
 	  }
   }
-| ESCALONAR {
-	fprintf(output, "#----------Escalonando os atributos -----------#\nfrom sklearn.preprocessing import StandardScaler\nscaler = StandardScaler()\nprevisores = scaler.fit_transform(previsores)\n");
+| ESCALONAR IDENTIFIER {
+	fprintf(output, "#----------Escalonando os atributos -----------#\n");
+	if(encontreImport(head, IMPORTSCALER) == -1){
+		addImport(&head, IMPORTSCALER);
+		fprintf(output, "from sklearn.preprocessing import StandardScaler\n");
+	}
+	fprintf(output, "scaler = StandardScaler()\n");
+	VAR *p=FindVAR($2);
+	if(p!=NULL){//se achou a base que ta tentando escalonar...
+		fprintf(output, "previsores_%s = scaler.fit_transform(previsores_%s)\n",p->name,p->name);
+	}
 }
 | DIVISAO { fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\nfrom sklearn.model_selection import train_test_split\nporcentagem_divisao = "); } exp {
 	fprintf(output, "\nprevisores_treinamento, previsores_teste, classe_treinamento, classe_teste = train_test_split(\n    previsores, classe, test_size=porcentagem_divisao\n)\n");
