@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include "sym.h"
+#include <time.h>
 extern int yylineno;
 extern int global_scope;
 extern VAR *SymTab;
@@ -112,7 +113,15 @@ char* pegarLetras(char line[]){
 
 %%
 
-program : commands { }
+program : { 
+	time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+	fprintf(output, "\"\"\"\nTemplate gerado por Flauberth Duarte.\n");
+    fprintf(output,"Gerado em: %02d-%02d-%d %02d:%02d:%02d\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	fprintf(output,"#-------Encontre me em: -------------#\n");
+	fprintf(output, "Github: https://github.com/Samanosukeh\n");
+	fprintf(output,"Site:   www.samanosuke.com.br\n\"\"\"\n\n");
+} commands
 ;
 
 commands : /* empty */

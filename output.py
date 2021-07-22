@@ -1,3 +1,11 @@
+"""
+Template gerado por Flauberth Duarte.
+Gerado em: 22-07-2021 11:38:28
+#-------Encontre me em: -------------#
+Github: https://github.com/Samanosukeh
+Site:   www.samanosuke.com.br
+"""
+
 import pandas as pd
 base1 = pd.read_csv('credit_data.csv')
 
@@ -30,7 +38,13 @@ imputer = imputer.fit(previsores_base1[:, inicio_previsores_base1:coluna_classe_
 previsores_base1[:, inicio_previsores_base1:coluna_classe_base1] = imputer.transform(previsores_base1[:, inicio_previsores_base1:coluna_classe_base1])
 
 
+#-------- Tratando os valores faltantes -----------#
+imputer = SimpleImputer(missing_values = np.nan)
+imputer = imputer.fit(previsores_base2[:, inicio_previsores_base2:coluna_classe_base2])
+previsores_base2[:, inicio_previsores_base2:coluna_classe_base2] = imputer.transform(previsores_base2[:, inicio_previsores_base2:coluna_classe_base2])
+
+
 #----------Escalonando os atributos -----------#
 from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
-previsores = scaler.fit_transform(previsores)
+previsores_base1 = scaler.fit_transform(previsores_base1)
