@@ -290,8 +290,11 @@ command : CARREGA {//verifica se ja add o import no código
 	VAR *base=FindVAR($3);
 	fprintf(output, "modelo_%s.fit(previsores_treinamento_%s, classe_treinamento_%s)\n",modelo->name, base->name, base->name);
 }
-| PREDICAO {
-	fprintf(output, "\n#---------- Fazendo as predições -----------#\nprevisoes = modelo.predict(previsores_teste)\n");
+| PREDICAO IDENTIFIER IDENTIFIER{
+	fprintf(output, "\n#---------- Fazendo as predições -----------#\n");
+	VAR *modelo=FindVAR($2);
+	VAR *base=FindVAR($3);
+	fprintf(output, "previsoes_%s = modelo_%s.predict(previsores_teste_%s)\n", base->name, modelo->name, base->name);
 }
 | RESULTADO resultados {}
 | IDENTIFIER ASSGNOP { fprintf(output, "%s = ", $1); } exp { 
