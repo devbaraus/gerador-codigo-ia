@@ -3,12 +3,11 @@ faltantes base1 media;
 escalonar base1;
 transformar base1 classe;
 divisao base1 25;
-
 classificador sv svm rbf;
 classificador rf randomforest 40;
 classificador knn knn 5;
-
-
 treinamento rf base1;
+
+
 predicao base1;
 resultado acuracia;

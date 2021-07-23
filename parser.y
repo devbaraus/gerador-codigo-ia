@@ -280,8 +280,15 @@ command : CARREGA {//verifica se ja add o import no código
 	fprintf(output, "    previsores_%s, classe_%s, test_size=porcentagem_divisao\n)\n\n",p->name, p->name);
  }
 | CLASSIFICADOR { modelo = 0; } modelo
-| TREINAMENTO {
-	fprintf(output, "\n#---------- Treinando o modelo -----------#\nmodelo.fit(previsores_treinamento, classe_treinamento)\n");
+| TREINAMENTO IDENTIFIER IDENTIFIER {
+	fprintf(output, "\n#---------- Treinando o modelo -----------#\n");
+	/*
+	É preciso buscar para ver se o modelo foi instanciado
+	É preciso buscar se a base foi instanciada
+	*/
+	VAR *modelo=FindVAR($2);
+	VAR *base=FindVAR($3);
+	fprintf(output, "modelo_%s.fit(previsores_treinamento_%s, classe_treinamento_%s)\n",modelo->name, base->name, base->name);
 }
 | PREDICAO {
 	fprintf(output, "\n#---------- Fazendo as predições -----------#\nprevisoes = modelo.predict(previsores_teste)\n");
@@ -298,6 +305,10 @@ command : CARREGA {//verifica se ja add o import no código
 modelo: IDENTIFIER IDENTIFIER param {
 	/*é preciso armazenar na tabela o nome da variável que 
 	guarda o modelo para que ela não seja mais usada*/
+	VAR *buscar = FindVAR($1);
+	if (buscar == NULL){
+		AddVAR($1,INT);
+	}
 	if(modelo == 0){ // se for um modelo de classificação...
 		if(strcmp($2, "svm") == 0){// se o classificador for SVM...
 			fprintf(output, "#---------- SVM -----------#\n");
@@ -306,9 +317,9 @@ modelo: IDENTIFIER IDENTIFIER param {
 				fprintf(output, "from sklearn.svm import SVC\n");
 			}
 			if ($3 != NULL)
-				fprintf(output, "classificador_%s = SVC(kernel=\"%s\", random_state=0)\n\n",$1, $3);
+				fprintf(output, "modelo_%s = SVC(kernel=\"%s\", random_state=0)\n\n",$1, $3);
 			else
-				fprintf(output, "classificador_%s = SVC(random_state=0)\n\n",$1);
+				fprintf(output, "modelo_%s = SVC(random_state=0)\n\n",$1);
 		}
 		else if (strcmp($2, "randomforest") == 0){ // se o classificador for random forest...
 			fprintf(output, "#---------- RandomForest -----------#\n");
@@ -316,7 +327,7 @@ modelo: IDENTIFIER IDENTIFIER param {
 				addImport(&head, IMPORTRFC);// add ele na tabela de símbolos
 				fprintf(output, "from sklearn.ensemble import RandomForestClassifier\n");
 			}
-			fprintf(output, "classificador_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n\n",$1, $3);
+			fprintf(output, "modelo_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n\n",$1, $3);
 		}
 		else if (strcmp($2, "knn") == 0){ // se o classificador for KNN...
 			fprintf(output, "#---------- KNN -----------#\n");
@@ -324,7 +335,7 @@ modelo: IDENTIFIER IDENTIFIER param {
 				addImport(&head, IMPORTKNNC);// add ele na tabela de símbolos
 				fprintf(output, "from sklearn.neighbors import KNeighborsClassifier\n");
 			}
-			fprintf(output, "classificador_%s = KNeighborsClassifier(n_neighbors=%d, metric='minkowski', p=2)\n",$1, $3);
+			fprintf(output, "modelo_%s = KNeighborsClassifier(n_neighbors=%d, metric='minkowski', p=2)\n",$1, $3);
 		}
 	}
 }
