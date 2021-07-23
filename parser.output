@@ -1,6 +1,5 @@
 Terminals unused in grammar
 
-   TRANSFORMAR
    '>'
    '<'
    '='
@@ -11,58 +10,65 @@ Terminals unused in grammar
    '^'
 
 
+State 49 conflicts: 5 shift/reduce
+
+
 Grammar
 
     0 $accept: program $end
 
-    1 program: commands
+    1 $@1: %empty
 
-    2 commands: %empty
-    3         | command ';' commands
+    2 program: $@1 commands
 
-    4 command: SKIP
+    3 commands: %empty
+    4         | command ';' commands
 
-    5 $@1: %empty
+    5 $@2: %empty
 
-    6 $@2: %empty
+    6 $@3: %empty
 
-    7 $@3: %empty
+    7 $@4: %empty
 
-    8 command: CARREGA $@1 IDENTIFIER $@2 IDENTIFIER $@3
-    9        | ESCALONAR
+    8 command: CARREGA $@2 IDENTIFIER $@3 IDENTIFIER $@4 exp exp
 
-   10 $@4: %empty
+    9 $@5: %empty
 
-   11 command: DIVISAO $@4 exp
-   12        | TREINAMENTO
-   13        | PREDICAO
-   14        | RESULTADO resultados
-   15        | READ IDENTIFIER
-   16        | WRITE IDENTIFIER
+   10 command: FALTANTES $@5 IDENTIFIER exp
+   11        | ESCALONAR IDENTIFIER
+   12        | TRANSFORMAR IDENTIFIER IDENTIFIER
+   13        | DIVISAO IDENTIFIER NUMINT
 
-   17 $@5: %empty
+   14 $@6: %empty
 
-   18 command: IDENTIFIER ASSGNOP $@5 exp
+   15 command: CLASSIFICADOR $@6 modelo
+   16        | TREINAMENTO
+   17        | PREDICAO
+   18        | RESULTADO resultados
 
-   19 $@6: %empty
+   19 $@7: %empty
 
-   20 $@7: %empty
+   20 command: IDENTIFIER ASSGNOP $@7 exp
 
-   21 $@8: %empty
+   21 modelo: IDENTIFIER IDENTIFIER param
 
-   22 command: $@6 IF exp $@7 THEN commands FI $@8
+   22 resultados: ACURACIA
 
-   23 resultados: ACURACIA
-
-   24 exp: NUMINT
+   23 exp: %empty
+   24    | NUMINT
    25    | NUMFLT
    26    | IDENTIFIER
 
-   27 $@9: %empty
+   27 $@8: %empty
 
-   28 $@10: %empty
+   28 $@9: %empty
 
-   29 exp: '(' $@9 exp ')' $@10
+   29 exp: '(' $@8 exp ')' $@9
+   30    | PARAMETRO
+
+   31 param: %empty
+   32      | NUMINT
+   33      | IDENTIFIER
 
 
 Terminals, with rules where they appear
@@ -74,481 +80,541 @@ $end (0) 0
 '+' (43)
 '-' (45)
 '/' (47)
-';' (59) 3
+';' (59) 4
 '<' (60)
 '=' (61)
 '>' (62)
 '^' (94)
 error (256)
-SKIP (258) 4
-IF (259) 22
-THEN (260) 22
-READ (261) 15
-WRITE (262) 16
-FI (263) 22
-NUMINT (264) 24
-NUMFLT (265) 25
-IDENTIFIER (266) 8 15 16 18 26
-CARREGA (267) 8
-TREINAMENTO (268) 12
-PREDICAO (269) 13
-RESULTADO (270) 14
-ACURACIA (271) 23
-DIVISAO (272) 11
-ESCALONAR (273) 9
-TRANSFORMAR (274)
-ASSGNOP (275) 18
+NUMINT (258) 13 24 32
+NUMFLT (259) 25
+IDENTIFIER (260) 8 10 11 12 13 20 21 26 33
+PARAMETRO (261) 30
+CARREGA (262) 8
+TREINAMENTO (263) 16
+PREDICAO (264) 17
+RESULTADO (265) 18
+ACURACIA (266) 22
+DIVISAO (267) 13
+ESCALONAR (268) 11
+TRANSFORMAR (269) 12
+ASSGNOP (270) 20
+FALTANTES (271) 10
+CLASSIFICADOR (272) 15
 
 
 Nonterminals, with rules where they appear
 
-$accept (32)
+$accept (29)
     on left: 0
-program (33)
-    on left: 1, on right: 0
-commands (34)
-    on left: 2 3, on right: 1 3 22
-command (35)
-    on left: 4 8 9 11 12 13 14 15 16 18 22, on right: 3
-$@1 (36)
+program (30)
+    on left: 2, on right: 0
+$@1 (31)
+    on left: 1, on right: 2
+commands (32)
+    on left: 3 4, on right: 2 4
+command (33)
+    on left: 8 10 11 12 13 15 16 17 18 20, on right: 4
+$@2 (34)
     on left: 5, on right: 8
-$@2 (37)
+$@3 (35)
     on left: 6, on right: 8
-$@3 (38)
+$@4 (36)
     on left: 7, on right: 8
-$@4 (39)
-    on left: 10, on right: 11
-$@5 (40)
-    on left: 17, on right: 18
-$@6 (41)
-    on left: 19, on right: 22
-$@7 (42)
-    on left: 20, on right: 22
+$@5 (37)
+    on left: 9, on right: 10
+$@6 (38)
+    on left: 14, on right: 15
+$@7 (39)
+    on left: 19, on right: 20
+modelo (40)
+    on left: 21, on right: 15
+resultados (41)
+    on left: 22, on right: 18
+exp (42)
+    on left: 23 24 25 26 29 30, on right: 8 10 20 29
 $@8 (43)
-    on left: 21, on right: 22
-resultados (44)
-    on left: 23, on right: 14
-exp (45)
-    on left: 24 25 26 29, on right: 11 18 22 29
-$@9 (46)
     on left: 27, on right: 29
-$@10 (47)
+$@9 (44)
     on left: 28, on right: 29
+param (45)
+    on left: 31 32 33, on right: 21
 
 
 State 0
 
     0 $accept: . program $end
 
-    SKIP         shift, and go to state 1
-    READ         shift, and go to state 2
-    WRITE        shift, and go to state 3
-    IDENTIFIER   shift, and go to state 4
-    CARREGA      shift, and go to state 5
-    TREINAMENTO  shift, and go to state 6
-    PREDICAO     shift, and go to state 7
-    RESULTADO    shift, and go to state 8
-    DIVISAO      shift, and go to state 9
-    ESCALONAR    shift, and go to state 10
+    $default  reduce using rule 1 ($@1)
 
-    IF        reduce using rule 19 ($@6)
-    $default  reduce using rule 2 (commands)
-
-    program   go to state 11
-    commands  go to state 12
-    command   go to state 13
-    $@6       go to state 14
+    program  go to state 1
+    $@1      go to state 2
 
 
 State 1
 
-    4 command: SKIP .
+    0 $accept: program . $end
 
-    $default  reduce using rule 4 (command)
+    $end  shift, and go to state 3
 
 
 State 2
 
-   15 command: READ . IDENTIFIER
+    2 program: $@1 . commands
 
-    IDENTIFIER  shift, and go to state 15
+    IDENTIFIER     shift, and go to state 4
+    CARREGA        shift, and go to state 5
+    TREINAMENTO    shift, and go to state 6
+    PREDICAO       shift, and go to state 7
+    RESULTADO      shift, and go to state 8
+    DIVISAO        shift, and go to state 9
+    ESCALONAR      shift, and go to state 10
+    TRANSFORMAR    shift, and go to state 11
+    FALTANTES      shift, and go to state 12
+    CLASSIFICADOR  shift, and go to state 13
+
+    $default  reduce using rule 3 (commands)
+
+    commands  go to state 14
+    command   go to state 15
 
 
 State 3
-
-   16 command: WRITE . IDENTIFIER
-
-    IDENTIFIER  shift, and go to state 16
-
-
-State 4
-
-   18 command: IDENTIFIER . ASSGNOP $@5 exp
-
-    ASSGNOP  shift, and go to state 17
-
-
-State 5
-
-    8 command: CARREGA . $@1 IDENTIFIER $@2 IDENTIFIER $@3
-
-    $default  reduce using rule 5 ($@1)
-
-    $@1  go to state 18
-
-
-State 6
-
-   12 command: TREINAMENTO .
-
-    $default  reduce using rule 12 (command)
-
-
-State 7
-
-   13 command: PREDICAO .
-
-    $default  reduce using rule 13 (command)
-
-
-State 8
-
-   14 command: RESULTADO . resultados
-
-    ACURACIA  shift, and go to state 19
-
-    resultados  go to state 20
-
-
-State 9
-
-   11 command: DIVISAO . $@4 exp
-
-    $default  reduce using rule 10 ($@4)
-
-    $@4  go to state 21
-
-
-State 10
-
-    9 command: ESCALONAR .
-
-    $default  reduce using rule 9 (command)
-
-
-State 11
-
-    0 $accept: program . $end
-
-    $end  shift, and go to state 22
-
-
-State 12
-
-    1 program: commands .
-
-    $default  reduce using rule 1 (program)
-
-
-State 13
-
-    3 commands: command . ';' commands
-
-    ';'  shift, and go to state 23
-
-
-State 14
-
-   22 command: $@6 . IF exp $@7 THEN commands FI $@8
-
-    IF  shift, and go to state 24
-
-
-State 15
-
-   15 command: READ IDENTIFIER .
-
-    $default  reduce using rule 15 (command)
-
-
-State 16
-
-   16 command: WRITE IDENTIFIER .
-
-    $default  reduce using rule 16 (command)
-
-
-State 17
-
-   18 command: IDENTIFIER ASSGNOP . $@5 exp
-
-    $default  reduce using rule 17 ($@5)
-
-    $@5  go to state 25
-
-
-State 18
-
-    8 command: CARREGA $@1 . IDENTIFIER $@2 IDENTIFIER $@3
-
-    IDENTIFIER  shift, and go to state 26
-
-
-State 19
-
-   23 resultados: ACURACIA .
-
-    $default  reduce using rule 23 (resultados)
-
-
-State 20
-
-   14 command: RESULTADO resultados .
-
-    $default  reduce using rule 14 (command)
-
-
-State 21
-
-   11 command: DIVISAO $@4 . exp
-
-    NUMINT      shift, and go to state 27
-    NUMFLT      shift, and go to state 28
-    IDENTIFIER  shift, and go to state 29
-    '('         shift, and go to state 30
-
-    exp  go to state 31
-
-
-State 22
 
     0 $accept: program $end .
 
     $default  accept
 
 
+State 4
+
+   20 command: IDENTIFIER . ASSGNOP $@7 exp
+
+    ASSGNOP  shift, and go to state 16
+
+
+State 5
+
+    8 command: CARREGA . $@2 IDENTIFIER $@3 IDENTIFIER $@4 exp exp
+
+    $default  reduce using rule 5 ($@2)
+
+    $@2  go to state 17
+
+
+State 6
+
+   16 command: TREINAMENTO .
+
+    $default  reduce using rule 16 (command)
+
+
+State 7
+
+   17 command: PREDICAO .
+
+    $default  reduce using rule 17 (command)
+
+
+State 8
+
+   18 command: RESULTADO . resultados
+
+    ACURACIA  shift, and go to state 18
+
+    resultados  go to state 19
+
+
+State 9
+
+   13 command: DIVISAO . IDENTIFIER NUMINT
+
+    IDENTIFIER  shift, and go to state 20
+
+
+State 10
+
+   11 command: ESCALONAR . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 21
+
+
+State 11
+
+   12 command: TRANSFORMAR . IDENTIFIER IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 22
+
+
+State 12
+
+   10 command: FALTANTES . $@5 IDENTIFIER exp
+
+    $default  reduce using rule 9 ($@5)
+
+    $@5  go to state 23
+
+
+State 13
+
+   15 command: CLASSIFICADOR . $@6 modelo
+
+    $default  reduce using rule 14 ($@6)
+
+    $@6  go to state 24
+
+
+State 14
+
+    2 program: $@1 commands .
+
+    $default  reduce using rule 2 (program)
+
+
+State 15
+
+    4 commands: command . ';' commands
+
+    ';'  shift, and go to state 25
+
+
+State 16
+
+   20 command: IDENTIFIER ASSGNOP . $@7 exp
+
+    $default  reduce using rule 19 ($@7)
+
+    $@7  go to state 26
+
+
+State 17
+
+    8 command: CARREGA $@2 . IDENTIFIER $@3 IDENTIFIER $@4 exp exp
+
+    IDENTIFIER  shift, and go to state 27
+
+
+State 18
+
+   22 resultados: ACURACIA .
+
+    $default  reduce using rule 22 (resultados)
+
+
+State 19
+
+   18 command: RESULTADO resultados .
+
+    $default  reduce using rule 18 (command)
+
+
+State 20
+
+   13 command: DIVISAO IDENTIFIER . NUMINT
+
+    NUMINT  shift, and go to state 28
+
+
+State 21
+
+   11 command: ESCALONAR IDENTIFIER .
+
+    $default  reduce using rule 11 (command)
+
+
+State 22
+
+   12 command: TRANSFORMAR IDENTIFIER . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 29
+
+
 State 23
 
-    3 commands: command ';' . commands
+   10 command: FALTANTES $@5 . IDENTIFIER exp
 
-    SKIP         shift, and go to state 1
-    READ         shift, and go to state 2
-    WRITE        shift, and go to state 3
-    IDENTIFIER   shift, and go to state 4
-    CARREGA      shift, and go to state 5
-    TREINAMENTO  shift, and go to state 6
-    PREDICAO     shift, and go to state 7
-    RESULTADO    shift, and go to state 8
-    DIVISAO      shift, and go to state 9
-    ESCALONAR    shift, and go to state 10
-
-    IF        reduce using rule 19 ($@6)
-    $default  reduce using rule 2 (commands)
-
-    commands  go to state 32
-    command   go to state 13
-    $@6       go to state 14
+    IDENTIFIER  shift, and go to state 30
 
 
 State 24
 
-   22 command: $@6 IF . exp $@7 THEN commands FI $@8
+   15 command: CLASSIFICADOR $@6 . modelo
 
-    NUMINT      shift, and go to state 27
-    NUMFLT      shift, and go to state 28
-    IDENTIFIER  shift, and go to state 29
-    '('         shift, and go to state 30
+    IDENTIFIER  shift, and go to state 31
 
-    exp  go to state 33
+    modelo  go to state 32
 
 
 State 25
 
-   18 command: IDENTIFIER ASSGNOP $@5 . exp
+    4 commands: command ';' . commands
 
-    NUMINT      shift, and go to state 27
-    NUMFLT      shift, and go to state 28
-    IDENTIFIER  shift, and go to state 29
-    '('         shift, and go to state 30
+    IDENTIFIER     shift, and go to state 4
+    CARREGA        shift, and go to state 5
+    TREINAMENTO    shift, and go to state 6
+    PREDICAO       shift, and go to state 7
+    RESULTADO      shift, and go to state 8
+    DIVISAO        shift, and go to state 9
+    ESCALONAR      shift, and go to state 10
+    TRANSFORMAR    shift, and go to state 11
+    FALTANTES      shift, and go to state 12
+    CLASSIFICADOR  shift, and go to state 13
 
-    exp  go to state 34
+    $default  reduce using rule 3 (commands)
+
+    commands  go to state 33
+    command   go to state 15
 
 
 State 26
 
-    8 command: CARREGA $@1 IDENTIFIER . $@2 IDENTIFIER $@3
+   20 command: IDENTIFIER ASSGNOP $@7 . exp
 
-    $default  reduce using rule 6 ($@2)
+    NUMINT      shift, and go to state 34
+    NUMFLT      shift, and go to state 35
+    IDENTIFIER  shift, and go to state 36
+    PARAMETRO   shift, and go to state 37
+    '('         shift, and go to state 38
 
-    $@2  go to state 35
+    $default  reduce using rule 23 (exp)
+
+    exp  go to state 39
 
 
 State 27
+
+    8 command: CARREGA $@2 IDENTIFIER . $@3 IDENTIFIER $@4 exp exp
+
+    $default  reduce using rule 6 ($@3)
+
+    $@3  go to state 40
+
+
+State 28
+
+   13 command: DIVISAO IDENTIFIER NUMINT .
+
+    $default  reduce using rule 13 (command)
+
+
+State 29
+
+   12 command: TRANSFORMAR IDENTIFIER IDENTIFIER .
+
+    $default  reduce using rule 12 (command)
+
+
+State 30
+
+   10 command: FALTANTES $@5 IDENTIFIER . exp
+
+    NUMINT      shift, and go to state 34
+    NUMFLT      shift, and go to state 35
+    IDENTIFIER  shift, and go to state 36
+    PARAMETRO   shift, and go to state 37
+    '('         shift, and go to state 38
+
+    $default  reduce using rule 23 (exp)
+
+    exp  go to state 41
+
+
+State 31
+
+   21 modelo: IDENTIFIER . IDENTIFIER param
+
+    IDENTIFIER  shift, and go to state 42
+
+
+State 32
+
+   15 command: CLASSIFICADOR $@6 modelo .
+
+    $default  reduce using rule 15 (command)
+
+
+State 33
+
+    4 commands: command ';' commands .
+
+    $default  reduce using rule 4 (commands)
+
+
+State 34
 
    24 exp: NUMINT .
 
     $default  reduce using rule 24 (exp)
 
 
-State 28
+State 35
 
    25 exp: NUMFLT .
 
     $default  reduce using rule 25 (exp)
 
 
-State 29
+State 36
 
    26 exp: IDENTIFIER .
 
     $default  reduce using rule 26 (exp)
 
 
-State 30
-
-   29 exp: '(' . $@9 exp ')' $@10
-
-    $default  reduce using rule 27 ($@9)
-
-    $@9  go to state 36
-
-
-State 31
-
-   11 command: DIVISAO $@4 exp .
-
-    $default  reduce using rule 11 (command)
-
-
-State 32
-
-    3 commands: command ';' commands .
-
-    $default  reduce using rule 3 (commands)
-
-
-State 33
-
-   22 command: $@6 IF exp . $@7 THEN commands FI $@8
-
-    $default  reduce using rule 20 ($@7)
-
-    $@7  go to state 37
-
-
-State 34
-
-   18 command: IDENTIFIER ASSGNOP $@5 exp .
-
-    $default  reduce using rule 18 (command)
-
-
-State 35
-
-    8 command: CARREGA $@1 IDENTIFIER $@2 . IDENTIFIER $@3
-
-    IDENTIFIER  shift, and go to state 38
-
-
-State 36
-
-   29 exp: '(' $@9 . exp ')' $@10
-
-    NUMINT      shift, and go to state 27
-    NUMFLT      shift, and go to state 28
-    IDENTIFIER  shift, and go to state 29
-    '('         shift, and go to state 30
-
-    exp  go to state 39
-
-
 State 37
 
-   22 command: $@6 IF exp $@7 . THEN commands FI $@8
+   30 exp: PARAMETRO .
 
-    THEN  shift, and go to state 40
+    $default  reduce using rule 30 (exp)
 
 
 State 38
 
-    8 command: CARREGA $@1 IDENTIFIER $@2 IDENTIFIER . $@3
+   29 exp: '(' . $@8 exp ')' $@9
 
-    $default  reduce using rule 7 ($@3)
+    $default  reduce using rule 27 ($@8)
 
-    $@3  go to state 41
+    $@8  go to state 43
 
 
 State 39
 
-   29 exp: '(' $@9 exp . ')' $@10
+   20 command: IDENTIFIER ASSGNOP $@7 exp .
 
-    ')'  shift, and go to state 42
+    $default  reduce using rule 20 (command)
 
 
 State 40
 
-   22 command: $@6 IF exp $@7 THEN . commands FI $@8
+    8 command: CARREGA $@2 IDENTIFIER $@3 . IDENTIFIER $@4 exp exp
 
-    SKIP         shift, and go to state 1
-    READ         shift, and go to state 2
-    WRITE        shift, and go to state 3
-    IDENTIFIER   shift, and go to state 4
-    CARREGA      shift, and go to state 5
-    TREINAMENTO  shift, and go to state 6
-    PREDICAO     shift, and go to state 7
-    RESULTADO    shift, and go to state 8
-    DIVISAO      shift, and go to state 9
-    ESCALONAR    shift, and go to state 10
-
-    IF        reduce using rule 19 ($@6)
-    $default  reduce using rule 2 (commands)
-
-    commands  go to state 43
-    command   go to state 13
-    $@6       go to state 14
+    IDENTIFIER  shift, and go to state 44
 
 
 State 41
 
-    8 command: CARREGA $@1 IDENTIFIER $@2 IDENTIFIER $@3 .
+   10 command: FALTANTES $@5 IDENTIFIER exp .
 
-    $default  reduce using rule 8 (command)
+    $default  reduce using rule 10 (command)
 
 
 State 42
 
-   29 exp: '(' $@9 exp ')' . $@10
+   21 modelo: IDENTIFIER IDENTIFIER . param
 
-    $default  reduce using rule 28 ($@10)
+    NUMINT      shift, and go to state 45
+    IDENTIFIER  shift, and go to state 46
 
-    $@10  go to state 44
+    $default  reduce using rule 31 (param)
+
+    param  go to state 47
 
 
 State 43
 
-   22 command: $@6 IF exp $@7 THEN commands . FI $@8
+   29 exp: '(' $@8 . exp ')' $@9
 
-    FI  shift, and go to state 45
+    NUMINT      shift, and go to state 34
+    NUMFLT      shift, and go to state 35
+    IDENTIFIER  shift, and go to state 36
+    PARAMETRO   shift, and go to state 37
+    '('         shift, and go to state 38
+
+    $default  reduce using rule 23 (exp)
+
+    exp  go to state 48
 
 
 State 44
 
-   29 exp: '(' $@9 exp ')' $@10 .
+    8 command: CARREGA $@2 IDENTIFIER $@3 IDENTIFIER . $@4 exp exp
 
-    $default  reduce using rule 29 (exp)
+    $default  reduce using rule 7 ($@4)
+
+    $@4  go to state 49
 
 
 State 45
 
-   22 command: $@6 IF exp $@7 THEN commands FI . $@8
+   32 param: NUMINT .
 
-    $default  reduce using rule 21 ($@8)
-
-    $@8  go to state 46
+    $default  reduce using rule 32 (param)
 
 
 State 46
 
-   22 command: $@6 IF exp $@7 THEN commands FI $@8 .
+   33 param: IDENTIFIER .
 
-    $default  reduce using rule 22 (command)
+    $default  reduce using rule 33 (param)
+
+
+State 47
+
+   21 modelo: IDENTIFIER IDENTIFIER param .
+
+    $default  reduce using rule 21 (modelo)
+
+
+State 48
+
+   29 exp: '(' $@8 exp . ')' $@9
+
+    ')'  shift, and go to state 50
+
+
+State 49
+
+    8 command: CARREGA $@2 IDENTIFIER $@3 IDENTIFIER $@4 . exp exp
+
+    NUMINT      shift, and go to state 34
+    NUMFLT      shift, and go to state 35
+    IDENTIFIER  shift, and go to state 36
+    PARAMETRO   shift, and go to state 37
+    '('         shift, and go to state 38
+
+    NUMINT      [reduce using rule 23 (exp)]
+    NUMFLT      [reduce using rule 23 (exp)]
+    IDENTIFIER  [reduce using rule 23 (exp)]
+    PARAMETRO   [reduce using rule 23 (exp)]
+    '('         [reduce using rule 23 (exp)]
+    $default    reduce using rule 23 (exp)
+
+    exp  go to state 51
+
+
+State 50
+
+   29 exp: '(' $@8 exp ')' . $@9
+
+    $default  reduce using rule 28 ($@9)
+
+    $@9  go to state 52
+
+
+State 51
+
+    8 command: CARREGA $@2 IDENTIFIER $@3 IDENTIFIER $@4 exp . exp
+
+    NUMINT      shift, and go to state 34
+    NUMFLT      shift, and go to state 35
+    IDENTIFIER  shift, and go to state 36
+    PARAMETRO   shift, and go to state 37
+    '('         shift, and go to state 38
+
+    $default  reduce using rule 23 (exp)
+
+    exp  go to state 53
+
+
+State 52
+
+   29 exp: '(' $@8 exp ')' $@9 .
+
+    $default  reduce using rule 29 (exp)
+
+
+State 53
+
+    8 command: CARREGA $@2 IDENTIFIER $@3 IDENTIFIER $@4 exp exp .
+
+    $default  reduce using rule 8 (command)

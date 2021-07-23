@@ -1,12 +1,13 @@
-carrega base1 credit_data 6 1;
-carrega base2 risco_credito 7;
-faltantes base1 mean;
-faltantes base2;
+carrega base1 credit_data 4 1;
+faltantes base1 media;
 escalonar base1;
+transformar base1 classe;
+divisao base1 25;
+
+classificador sv svm rbf;
+classificador rf randomforest 40;
 
 
-divisao base1 0.25;
-classificador randomforest 40 base;
-treinamento base;
-predicao base;
+treinamento rf base1;
+predicao base1;
 resultado acuracia;

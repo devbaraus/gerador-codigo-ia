@@ -22,9 +22,10 @@ treinamento { printf("treinamento "); return(TREINAMENTO); }
 predicao { printf("predição "); return(PREDICAO); }
 faltantes { printf("faltantes "); return(FALTANTES); }
 resultado { printf("resultado "); return(RESULTADO); }
+classificador { printf("classificador "); return(CLASSIFICADOR); }
 acuracia { printf("acurácia "); return(ACURACIA); }
 {ID}     { printf("Identificador "); yylval.ystr = stringpool(yytext);  return(IDENTIFIER); }
--{ID}={DIGIT} { printf("parâmetro "); yylval.ystr = stringpool(yytext); return(PARAMETRO); }
+-{ID}={DIGIT}*?{ID}? { printf("parâmetro "); yylval.ystr = stringpool(yytext); return(PARAMETRO); }
 "\n"     { printf("\n");}
 "//"[A-Za-z0-9_ ]* {printf("Comentário"); }
 [ \t]+ /* blank, tab, new line: eat up whitespace */

@@ -11,13 +11,17 @@ FILE * output;
 #define INT     1
 #define BOOL    2
 #define FLT     3
+#define STR     4
 #define IMPORTDATABASE     111111 //usado para saber se ja foi add um import do pandas
 #define IMPORTIMPUTER      121212
 #define IMPORTSCALER       555555
 #define IMPORTLABELENCODER 222222
 #define IMPORTDIVISAO      333333
+#define IMPORTSVC          444444
+#define IMPORTRFC          424242 //Random Forest Classifier
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
+int modelo = 0; /* 0: classificação | 1: regressão */
 %}
 
 %define parse.error verbose //aparecer mais detalhes dos erros
@@ -105,13 +109,13 @@ char* pegarLetras(char line[]){
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
 %token CARREGA TREINAMENTO PREDICAO RESULTADO ACURACIA DIVISAO ESCALONAR TRANSFORMAR
-%token ASSGNOP FALTANTES
+%token ASSGNOP FALTANTES CLASSIFICADOR
 %left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
 %left '^'
 
-%type  <yint>  exp
+%type  <yint>  exp param
 
 %%
 
@@ -165,7 +169,7 @@ command : CARREGA {//verifica se ja add o import no código
 	   fprintf(output, "coluna_classe_%s = %d\n\n", p->name, $7);
 	   fprintf(output, "previsores_%s = %s.iloc[:, inicio_previsores_%s:coluna_classe_%s].values\n", p->name, p->name, p->name, p->name);
 	   fprintf(output, "classe_%s = %s.iloc[:, coluna_classe_%s].values\n\n\n",p->name, p->name, p->name);
-}
+ }
 | FALTANTES {
 	fprintf(output, "#-------- Tratando os valores faltantes -----------#\n");
 	if(encontreImport(head, IMPORTIMPUTER) == -1){
@@ -231,7 +235,7 @@ command : CARREGA {//verifica se ja add o import no código
 		printf("É necessário passar a base que será escalonada");
 	}
 	fprintf(output,"\n\n");
-}
+ }
 | TRANSFORMAR IDENTIFIER IDENTIFIER {
 	fprintf(output, "#----------Transformação categórica pra numérica -----------#\n");
 	if(encontreImport(head, IMPORTLABELENCODER) == -1){
@@ -258,7 +262,7 @@ command : CARREGA {//verifica se ja add o import no código
 	}
 	fprintf(output,"\n\n");
 	
-}
+ }
 | DIVISAO IDENTIFIER NUMINT { 
 	fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\n");
 	if(encontreImport(head, IMPORTDIVISAO) == -1){
@@ -272,8 +276,9 @@ command : CARREGA {//verifica se ja add o import no código
 		"previsores_treinamento_%s, previsores_teste_%s, classe_treinamento_%s, classe_teste_%s = train_test_split(\n"
 		,p->name,p->name,p->name,p->name
 	);
-	fprintf(output, "    previsores_%s, classe_%s, test_size=porcentagem_divisao\n)\n",p->name, p->name);
-}
+	fprintf(output, "    previsores_%s, classe_%s, test_size=porcentagem_divisao\n)\n\n",p->name, p->name);
+ }
+| CLASSIFICADOR { modelo = 0; } modelo
 | TREINAMENTO {
 	fprintf(output, "\n#---------- Treinando o modelo -----------#\nmodelo.fit(previsores_treinamento, classe_treinamento)\n");
 }
@@ -289,17 +294,41 @@ command : CARREGA {//verifica se ja add o import no código
 }
 ;
 
+modelo: IDENTIFIER IDENTIFIER param {
+	if(modelo == 0){ // se for um modelo de classificação...
+		if(strcmp($2, "svm") == 0){// se o classificador for SVM...
+			fprintf(output, "#---------- SVM -----------#\n");
+			if(encontreImport(head, IMPORTSVC) == -1){//primeira vez importanto o SVC?
+				addImport(&head, IMPORTSVC);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.svm import SVC\n");
+			}
+			if ($3 != NULL)
+				fprintf(output, "classificador_%s = SVC(kernel=\"%s\", random_state=0)\n\n",$1, $3);
+			else
+				fprintf(output, "classificador_%s = SVC(random_state=0)\n\n",$1);
+		}
+		else if (strcmp($2, "randomforest") == 0){ // se o classificador for random forest...
+			fprintf(output, "#---------- RandomForest -----------#\n");
+			if(encontreImport(head, IMPORTRFC) == -1){//primeira vez importanto o Random Forest?
+				addImport(&head, IMPORTRFC);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.ensemble import RandomForestClassifier\n");
+			}
+			fprintf(output, "classificador_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n",$1, $3);
+		}
+	}
+}
+
 resultados: ACURACIA {
 	fprintf(output, "\n#---------- Checando a pricisão ----------#\nfrom sklearn.metrics import accuracy_score\nprecisao = accuracy_score(classe_teste, previsoes)\n");
 }
 ;
 
 exp : /* ε */ { $$=UNDECL; }
-| NUMINT  { }
+| NUMINT  {  }
 | NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
 | IDENTIFIER  {// a única coisa guardada na tabela de simbolos
 	//VAR *p=FindVAR($1);
-	AddVAR($1, INT);
+	AddVAR($1, STR);
 	//ASSERT((p!=NULL),"Identificador Não declarado");
 	//$$= (p!=NULL)? p->type:UNDECL;
 	//fprintf(output, "%s", $1);
@@ -315,6 +344,10 @@ exp : /* ε */ { $$=UNDECL; }
 }
 /* | exp */
 ;
+
+param: /* ε */
+| NUMINT
+| IDENTIFIER
 
 %%
 
