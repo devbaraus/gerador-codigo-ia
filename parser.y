@@ -19,6 +19,7 @@ FILE * output;
 #define IMPORTDIVISAO      333333
 #define IMPORTSVC          444444
 #define IMPORTRFC          424242 //Random Forest Classifier
+#define IMPORTKNNC         123456 //KNN Classifier
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -295,6 +296,8 @@ command : CARREGA {//verifica se ja add o import no código
 ;
 
 modelo: IDENTIFIER IDENTIFIER param {
+	/*é preciso armazenar na tabela o nome da variável que 
+	guarda o modelo para que ela não seja mais usada*/
 	if(modelo == 0){ // se for um modelo de classificação...
 		if(strcmp($2, "svm") == 0){// se o classificador for SVM...
 			fprintf(output, "#---------- SVM -----------#\n");
@@ -313,7 +316,15 @@ modelo: IDENTIFIER IDENTIFIER param {
 				addImport(&head, IMPORTRFC);// add ele na tabela de símbolos
 				fprintf(output, "from sklearn.ensemble import RandomForestClassifier\n");
 			}
-			fprintf(output, "classificador_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n",$1, $3);
+			fprintf(output, "classificador_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n\n",$1, $3);
+		}
+		else if (strcmp($2, "knn") == 0){ // se o classificador for KNN...
+			fprintf(output, "#---------- KNN -----------#\n");
+			if(encontreImport(head, IMPORTKNNC) == -1){//primeira vez importanto o KNN?
+				addImport(&head, IMPORTKNNC);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.neighbors import KNeighborsClassifier\n");
+			}
+			fprintf(output, "classificador_%s = KNeighborsClassifier(n_neighbors=%d, metric='minkowski', p=2)\n",$1, $3);
 		}
 	}
 }

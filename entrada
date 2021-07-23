@@ -6,6 +6,7 @@ divisao base1 25;
 
 classificador sv svm rbf;
 classificador rf randomforest 40;
+classificador knn knn 5;
 
 
 treinamento rf base1;
