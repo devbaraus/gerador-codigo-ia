@@ -10,3 +10,4 @@ treinamento rf base1;
 predicao rf base1;
 
 resultado base1 acuracia;
+resultado base1 f1;

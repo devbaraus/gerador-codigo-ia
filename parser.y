@@ -21,6 +21,7 @@ FILE * output;
 #define IMPORTRFC          424242 //Random Forest Classifier
 #define IMPORTKNNC         123456 //KNN Classifier
 #define IMPORTACCURACY     324324
+#define IMPORTF1           666666
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -110,8 +111,8 @@ char* pegarLetras(char line[]){
 %token <yint> NUMINT // antes era NUMBER agora subistitui
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
-%token CARREGA TREINAMENTO PREDICAO RESULTADO ACURACIA DIVISAO ESCALONAR TRANSFORMAR
-%token FALTANTES CLASSIFICADOR
+%token CARREGA TREINAMENTO PREDICAO RESULTADO FALTANTES DIVISAO ESCALONAR TRANSFORMAR
+%token  CLASSIFICADOR ACURACIA F1
 %left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
@@ -347,6 +348,16 @@ resultados: IDENTIFIER ACURACIA {
 	/* Checar se o classificador existe e foi instanciado */
 	VAR *p=FindVAR($1);
 	fprintf(output, "precisao_%s = accuracy_score(classe_teste_%s, previsoes_%s)\n", p->name, p->name, p->name);
+}
+| IDENTIFIER F1 {
+	fprintf(output, "\n#---------- Checando a F1-Score ----------#\n");
+	if(encontreImport(head, IMPORTF1) == -1){
+		addImport(&head, IMPORTF1);
+		fprintf(output, "from sklearn.metrics import f1_score\n");
+	}
+	/* Checar se o classificador existe e foi instanciado */
+	VAR *p=FindVAR($1);
+	fprintf(output, "precisao_f1_%s = f1_score(classe_teste_%s, previsoes_%s, average='macro')\n", p->name, p->name, p->name);
 }
 ;
 
