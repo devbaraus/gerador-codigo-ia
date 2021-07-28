@@ -20,6 +20,7 @@ FILE * output;
 #define IMPORTSVC          444444
 #define IMPORTRFC          424242 //Random Forest Classifier
 #define IMPORTKNNC         123456 //KNN Classifier
+#define IMPORTACCURACY     324324
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -110,7 +111,7 @@ char* pegarLetras(char line[]){
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
 %token CARREGA TREINAMENTO PREDICAO RESULTADO ACURACIA DIVISAO ESCALONAR TRANSFORMAR
-%token ASSGNOP FALTANTES CLASSIFICADOR
+%token FALTANTES CLASSIFICADOR
 %left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
@@ -291,18 +292,12 @@ command : CARREGA {//verifica se ja add o import no código
 	fprintf(output, "modelo_%s.fit(previsores_treinamento_%s, classe_treinamento_%s)\n",modelo->name, base->name, base->name);
 }
 | PREDICAO IDENTIFIER IDENTIFIER{
-	fprintf(output, "\n#---------- Fazendo as predições -----------#\n");
+	fprintf(output, "\n#---------- Fazendo a predição -----------#\n");
 	VAR *modelo=FindVAR($2);
 	VAR *base=FindVAR($3);
 	fprintf(output, "previsoes_%s = modelo_%s.predict(previsores_teste_%s)\n", base->name, modelo->name, base->name);
 }
 | RESULTADO resultados {}
-| IDENTIFIER ASSGNOP { fprintf(output, "%s = ", $1); } exp { 
-	VAR *p=FindVAR($1);
-	ASSERT((p!=NULL),"Identificador Não declarado/");
-	ASSERT( (p->type == INT && $4 == INT) || (p->type == FLT && ($4 == INT || $4 == FLT) ), " Tipo incompatível de dados");
-	fprintf(output, ";\n");
-}
 ;
 
 modelo: IDENTIFIER IDENTIFIER param {
@@ -343,8 +338,15 @@ modelo: IDENTIFIER IDENTIFIER param {
 	}
 }
 
-resultados: ACURACIA {
-	fprintf(output, "\n#---------- Checando a pricisão ----------#\nfrom sklearn.metrics import accuracy_score\nprecisao = accuracy_score(classe_teste, previsoes)\n");
+resultados: IDENTIFIER ACURACIA {
+	fprintf(output, "\n#---------- Checando a precisão ----------#\n");
+	if(encontreImport(head, IMPORTACCURACY) == -1){
+		addImport(&head, IMPORTACCURACY);
+		fprintf(output, "from sklearn.metrics import accuracy_score\n");
+	}
+	/* Checar se o classificador existe e foi instanciado */
+	VAR *p=FindVAR($1);
+	fprintf(output, "precisao_%s = accuracy_score(classe_teste_%s, previsoes_%s)\n", p->name, p->name, p->name);
 }
 ;
 
@@ -352,12 +354,8 @@ exp : /* ε */ { $$=UNDECL; }
 | NUMINT  {  }
 | NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
 | IDENTIFIER  {// a única coisa guardada na tabela de simbolos
-	//VAR *p=FindVAR($1);
 	AddVAR($1, STR);
-	//ASSERT((p!=NULL),"Identificador Não declarado");
-	//$$= (p!=NULL)? p->type:UNDECL;
-	//fprintf(output, "%s", $1);
-}
+ }
 | '(' {fprintf(output,"(");} exp ')' {fprintf(output,")");}  { $$= $3;}
 | PARAMETRO {
 	AddVAR($1, INT);
@@ -367,12 +365,9 @@ exp : /* ε */ { $$=UNDECL; }
 	pegarLetras(comando);
 	printf("- %s -", comando);
 }
-/* | exp */
 ;
 
-param: /* ε */
-| NUMINT
-| IDENTIFIER
+param: NUMINT | IDENTIFIER | /* ε */
 
 %%
 
