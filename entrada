@@ -1,5 +1,5 @@
 carrega base1 credit_data 4;
-carrega base2 risc_credit 9;
+carrega base2 risc_credit 9 1;
 faltantes base3 media;
 escalonar base1;
 transformar base1 classe;
@@ -8,6 +8,8 @@ classificador rf randomforest 40;
 classificador knn knn 5;
 treinamento rf base1;
 predicao rf base1;
-
 resultado base1 acuracia;
 resultado base1 f1;
+
+carrega base3 plano_saude 1;
+regressor rfr linear;

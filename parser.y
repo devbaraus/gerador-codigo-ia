@@ -22,6 +22,7 @@ FILE * output;
 #define IMPORTKNNC         123456 //KNN Classifier
 #define IMPORTACCURACY     324324
 #define IMPORTF1           666666
+#define IMPORTLINEAR       616161
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -112,7 +113,7 @@ char* pegarLetras(char line[]){
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
 %token CARREGA TREINAMENTO PREDICAO RESULTADO FALTANTES DIVISAO ESCALONAR TRANSFORMAR
-%token  CLASSIFICADOR ACURACIA F1
+%token CLASSIFICADOR REGRESSOR ACURACIA F1
 %left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
@@ -282,6 +283,7 @@ command : CARREGA {//verifica se ja add o import no código
 	fprintf(output, "    previsores_%s, classe_%s, test_size=porcentagem_divisao\n)\n\n",p->name, p->name);
  }
 | CLASSIFICADOR { modelo = 0; } modelo
+| REGRESSOR { modelo = 1; } modelo
 | TREINAMENTO IDENTIFIER IDENTIFIER {
 	fprintf(output, "\n#---------- Treinando o modelo -----------#\n");
 	/*
@@ -337,6 +339,15 @@ modelo: IDENTIFIER IDENTIFIER param {
 			fprintf(output, "modelo_%s = KNeighborsClassifier(n_neighbors=%d, metric='minkowski', p=2)\n",$1, $3);
 		}
 	}
+	else if(modelo ==1){//se for regressor...
+		if(strcmp($2, "linear") == 0){// se o regressor for SVM...
+			if(encontreImport(head, IMPORTLINEAR) == -1){
+				addImport(&head, IMPORTLINEAR);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.linear_model import LinearRegression\n");
+			}
+			fprintf(output, "modelo_%s = LinearRegression()\n\n",$1);
+		}
+	}
 }
 
 resultados: IDENTIFIER ACURACIA {
@@ -385,7 +396,7 @@ param: NUMINT | IDENTIFIER | /* ε */
 main( int argc, char *argv[] ) {
 	output = fopen("output.py","w");
 	init_stringpool(10000); //memória que vai guardar as strings
-	if ( yyparse () == 0) printf("codigo sem erros");
+	if ( yyparse () == 0) printf("\ncodigo sem erros");
 }
 
 yyerror(char *s) { /* Called by yyparse on error */
