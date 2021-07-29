@@ -25,6 +25,7 @@ FILE * output;
 #define IMPORTLINEAR       616161
 #define IMPORTPOLINOMIAL   626262
 #define IMPORTRFR          636363
+#define IMPORTSVR          646464
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -288,10 +289,8 @@ command : CARREGA {//verifica se ja add o import no código
 | REGRESSOR { modelo = 1; } modelo
 | TREINAMENTO IDENTIFIER IDENTIFIER {
 	fprintf(output, "\n#---------- Treinando o modelo -----------#\n");
-	/*
-	É preciso buscar para ver se o modelo foi instanciado
-	É preciso buscar se a base foi instanciada
-	*/
+	/* É preciso buscar para ver se o modelo foi instanciado
+	   É preciso buscar se a base foi instanciada */
 	VAR *modelo=FindVAR($2);
 	VAR *base=FindVAR($3);
 	fprintf(output, "modelo_%s.fit(previsores_treinamento_%s, classe_treinamento_%s)\n",modelo->name, base->name, base->name);
@@ -312,6 +311,7 @@ modelo: IDENTIFIER IDENTIFIER param param {
 	if (buscar == NULL){
 		AddVAR($1,INT);
 	}
+
 	if(modelo == 0){ // se for um modelo de classificação...
 		if(strcmp($2, "svm") == 0){// se o classificador for SVM...
 			fprintf(output, "#---------- SVM -----------#\n");
@@ -385,6 +385,17 @@ modelo: IDENTIFIER IDENTIFIER param param {
 				fprintf(output, "modelo_%s = RandomForestRegressor(n_estimators=%d, random_state=0)\n\n",$1, $3);
 			else          //se não passou, deixar a quantidade padrão do RFR
 				fprintf(output, "modelo_%s = RandomForestRegressor(random_state=0)\n\n",$1);
+		}
+		else if(strcmp($2, "svm") == 0){// se o classificador for SVM...
+			fprintf(output, "#---------- Regressor SVM -----------#\n");
+			if(encontreImport(head, IMPORTSVR) == -1){//primeira vez importanto o SVC?
+				addImport(&head, IMPORTSVR);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.svm import SVR\n");
+			}
+			if ($3 != NULL)
+				fprintf(output, "modelo_%s = SVR(kernel=\"%s\")\n\n",$1, $3);
+			else
+				fprintf(output, "modelo_%s = SVR()\n\n",$1);
 		}
 	}
 }
