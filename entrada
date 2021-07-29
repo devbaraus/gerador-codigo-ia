@@ -1,6 +1,6 @@
 carrega base1 credit_data 4;
 carrega base2 risc_credit 9 1;
-faltantes base3 media;
+faltantes base2 media;
 escalonar base1;
 transformar base1 classe;
 divisao base1 25;
@@ -12,4 +12,6 @@ resultado base1 acuracia;
 resultado base1 f1;
 
 carrega base3 plano_saude 1;
-regressor rfr linear;
+regressor rp polinomial 2 base3;
+
+regressor rfr randomforest;

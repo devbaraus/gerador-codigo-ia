@@ -375,6 +375,17 @@ modelo: IDENTIFIER IDENTIFIER param param {
 				printf("\n~> É necessário informar o grau do polinômio na regressão polinomial <~\n");
 			}
 		}
+		else if (strcmp($2, "randomforest") == 0){
+			fprintf(output, "#---------- Regressor RandomForest -----------#\n");
+			if(encontreImport(head, IMPORTRFR) == -1){//primeira vez importanto o Regressor Random Forest?
+				addImport(&head, IMPORTRFR);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.ensemble import RandomForestRegressor\n");
+			}
+			if ($3 != NULL)//se passou a quantidade de arvores...
+				fprintf(output, "modelo_%s = RandomForestRegressor(n_estimators=%d, random_state=0)\n\n",$1, $3);
+			else          //se não passou, deixar a quantidade padrão do RFR
+				fprintf(output, "modelo_%s = RandomForestRegressor(random_state=0)\n\n",$1);
+		}
 	}
 }
 
@@ -417,7 +428,7 @@ exp : /* ε */ { $$=UNDECL; }
 }
 ;
 
-param: NUMINT | IDENTIFIER | /* ε */
+param: NUMINT | IDENTIFIER | /* ε */ { $$=NULL; }
 
 %%
 
