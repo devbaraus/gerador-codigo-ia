@@ -27,6 +27,7 @@ FILE * output;
 #define IMPORTRFR          636363
 #define IMPORTSVR          646464
 #define IMPORTMSE          656565
+#define IMPORTR2		   676767
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -117,7 +118,7 @@ char* pegarLetras(char line[]){
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
 %token CARREGA TREINAMENTO PREDICAO RESULTADO FALTANTES DIVISAO ESCALONAR TRANSFORMAR
-%token CLASSIFICADOR REGRESSOR ACURACIA F1 MSE
+%token CLASSIFICADOR REGRESSOR ACURACIA F1 MSE R2
 %left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
@@ -410,7 +411,7 @@ resultados: IDENTIFIER ACURACIA {
 	/* Checar se o classificador existe e foi instanciado */
 	VAR *p=FindVAR($1);
 	fprintf(output, "precisao_%s = accuracy_score(classe_teste_%s, previsoes_%s)\n", p->name, p->name, p->name);
-}
+ }
 | IDENTIFIER F1 {
 	fprintf(output, "\n#---------- Checando a F1-Score ----------#\n");
 	if(encontreImport(head, IMPORTF1) == -1){
@@ -430,7 +431,17 @@ resultados: IDENTIFIER ACURACIA {
 	/* Checar se o regressor existe e foi instanciado */
 	VAR *p=FindVAR($1);
 	fprintf(output, "mse_%s = mean_squared_error(classe_teste_%s, previsoes_%s)\n\n", p->name, p->name, p->name);
-}
+ }
+| IDENTIFIER R2 {
+	fprintf(output, "\n#---------- Checando o Score R2 ----------#\n");
+	if(encontreImport(head, IMPORTR2) == -1){
+		addImport(&head, IMPORTR2);
+		fprintf(output, "from sklearn.metrics import r2_score\n");
+	}
+	/* Checar se o regressor existe e foi instanciado */
+	VAR *p=FindVAR($1);
+	fprintf(output, "r2_%s = r2_score(classe_teste_%s, previsoes_%s)\n\n", p->name, p->name, p->name);
+ }
 ;
 
 exp : /* ε */ { $$=UNDECL; }
@@ -447,7 +458,7 @@ exp : /* ε */ { $$=UNDECL; }
 	strcpy(comando, p->name);
 	//pegarLetras(comando);
 	printf("- %s -", comando);
-}
+ }
 ;
 
 param: NUMINT | IDENTIFIER | /* ε */ { $$=NULL; }
