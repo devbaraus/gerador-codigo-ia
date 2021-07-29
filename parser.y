@@ -26,6 +26,7 @@ FILE * output;
 #define IMPORTPOLINOMIAL   626262
 #define IMPORTRFR          636363
 #define IMPORTSVR          646464
+#define IMPORTMSE          656565
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -116,7 +117,7 @@ char* pegarLetras(char line[]){
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
 %token CARREGA TREINAMENTO PREDICAO RESULTADO FALTANTES DIVISAO ESCALONAR TRANSFORMAR
-%token CLASSIFICADOR REGRESSOR ACURACIA F1
+%token CLASSIFICADOR REGRESSOR ACURACIA F1 MSE
 %left '>' '<' '='
 %left '-' '+'
 %left '*' '/'
@@ -419,6 +420,16 @@ resultados: IDENTIFIER ACURACIA {
 	/* Checar se o classificador existe e foi instanciado */
 	VAR *p=FindVAR($1);
 	fprintf(output, "precisao_f1_%s = f1_score(classe_teste_%s, previsoes_%s, average='macro')\n\n", p->name, p->name, p->name);
+ }
+| IDENTIFIER MSE {
+	fprintf(output, "\n#---------- Checando o MSE ----------#\n");
+	if(encontreImport(head, IMPORTMSE) == -1){
+		addImport(&head, IMPORTMSE);
+		fprintf(output, "from sklearn.metrics import mean_squared_error\n");
+	}
+	/* Checar se o regressor existe e foi instanciado */
+	VAR *p=FindVAR($1);
+	fprintf(output, "mse_%s = mean_squared_error(classe_teste_%s, previsoes_%s)\n\n", p->name, p->name, p->name);
 }
 ;
 
