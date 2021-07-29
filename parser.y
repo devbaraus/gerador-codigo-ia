@@ -302,7 +302,7 @@ command : CARREGA {//verifica se ja add o import no código
 	VAR *base=FindVAR($3);
 	fprintf(output, "previsoes_%s = modelo_%s.predict(previsores_teste_%s)\n", base->name, modelo->name, base->name);
 }
-| RESULTADO resultados {}
+| RESULTADO resultados
 ;
 
 modelo: IDENTIFIER IDENTIFIER param param {
@@ -341,7 +341,7 @@ modelo: IDENTIFIER IDENTIFIER param param {
 			fprintf(output, "modelo_%s = KNeighborsClassifier(n_neighbors=%d, metric='minkowski', p=2)\n",$1, $3);
 		}
 	}
-	else if(modelo ==1){//se for regressor...
+	else if(modelo == 1){//se for regressor...
 		if(strcmp($2, "linear") == 0){// se o regressor for SVM...
 			fprintf(output, "#---------- Regressão Linear -----------#\n");
 			if(encontreImport(head, IMPORTLINEAR) == -1){
@@ -412,7 +412,7 @@ resultados: IDENTIFIER ACURACIA {
 ;
 
 exp : /* ε */ { $$=UNDECL; }
-| NUMINT  {  }
+| NUMINT
 | NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
 | IDENTIFIER  {// a única coisa guardada na tabela de simbolos
 	AddVAR($1, STR);
@@ -423,7 +423,7 @@ exp : /* ε */ { $$=UNDECL; }
 	VAR *p=FindVAR($1);
 	char comando[50];//usado para guardar o comando sem modificar a string original
 	strcpy(comando, p->name);
-	pegarLetras(comando);
+	//pegarLetras(comando);
 	printf("- %s -", comando);
 }
 ;
