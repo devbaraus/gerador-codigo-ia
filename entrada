@@ -8,10 +8,15 @@ classificador rf randomforest 40;
 classificador knn knn 5;
 treinamento rf base1;
 predicao rf base1;
+treinamento knn base2;
 resultado base1 acuracia;
 resultado base1 f1;
 
 carrega base3 plano_saude 1;
+divisao base3 25;
 regressor rp polinomial 2 base3;
 
 regressor rfr randomforest;
+treinamento rfr base3;
+
+regressor svr svm rbf;
