@@ -23,6 +23,8 @@ FILE * output;
 #define IMPORTACCURACY     324324
 #define IMPORTF1           666666
 #define IMPORTLINEAR       616161
+#define IMPORTPOLINOMIAL   626262
+#define IMPORTRFR          636363
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
@@ -109,7 +111,7 @@ char* pegarLetras(char line[]){
 
 
 %start program
-%token <yint> NUMINT // antes era NUMBER agora subistitui
+%token <yint> NUMINT
 %token <yflt> NUMFLT
 %token <ystr> IDENTIFIER PARAMETRO
 %token CARREGA TREINAMENTO PREDICAO RESULTADO FALTANTES DIVISAO ESCALONAR TRANSFORMAR
@@ -303,7 +305,7 @@ command : CARREGA {//verifica se ja add o import no código
 | RESULTADO resultados {}
 ;
 
-modelo: IDENTIFIER IDENTIFIER param {
+modelo: IDENTIFIER IDENTIFIER param param {
 	/*é preciso armazenar na tabela o nome da variável que 
 	guarda o modelo para que ela não seja mais usada*/
 	VAR *buscar = FindVAR($1);
@@ -341,11 +343,37 @@ modelo: IDENTIFIER IDENTIFIER param {
 	}
 	else if(modelo ==1){//se for regressor...
 		if(strcmp($2, "linear") == 0){// se o regressor for SVM...
+			fprintf(output, "#---------- Regressão Linear -----------#\n");
 			if(encontreImport(head, IMPORTLINEAR) == -1){
 				addImport(&head, IMPORTLINEAR);// add ele na tabela de símbolos
 				fprintf(output, "from sklearn.linear_model import LinearRegression\n");
 			}
 			fprintf(output, "modelo_%s = LinearRegression()\n\n",$1);
+		}
+		else if(strcmp($2, "polinomial") == 0){// se o classificador for SVM...
+			fprintf(output, "#---------- Regressão Polinomial -----------#\n");
+			if(encontreImport(head, IMPORTPOLINOMIAL) == -1){//primeira vez importanto o SVC?
+				addImport(&head, IMPORTPOLINOMIAL);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.preprocessing import PolynomialFeatures\n");
+			}
+
+			if ($3 != NULL){//passou a quantidade do polinômio?
+				fprintf(output, "poly = PolynomialFeatures(degree = %d)\n", $3);
+				if($4 != NULL){
+					VAR *base=FindVAR($4);
+					fprintf(output, "previsores_%s = poly.fit_transform(previsores_%s)\n", base->name, base->name);
+					/* Antes de instanciar o regressor linear, verificar se ja foi importado do SKLEARN*/
+					if(encontreImport(head, IMPORTLINEAR) == -1){
+						addImport(&head, IMPORTLINEAR);// add ele na tabela de símbolos
+						fprintf(output, "from sklearn.linear_model import LinearRegression\n");
+					}
+					fprintf(output, "modelo_%s = LinearRegression()\n\n",$1);
+					
+				}
+			}
+			else{
+				printf("\n~> É necessário informar o grau do polinômio na regressão polinomial <~\n");
+			}
 		}
 	}
 }
@@ -368,7 +396,7 @@ resultados: IDENTIFIER ACURACIA {
 	}
 	/* Checar se o classificador existe e foi instanciado */
 	VAR *p=FindVAR($1);
-	fprintf(output, "precisao_f1_%s = f1_score(classe_teste_%s, previsoes_%s, average='macro')\n", p->name, p->name, p->name);
+	fprintf(output, "precisao_f1_%s = f1_score(classe_teste_%s, previsoes_%s, average='macro')\n\n", p->name, p->name, p->name);
 }
 ;
 
