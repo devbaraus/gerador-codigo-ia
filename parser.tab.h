@@ -46,20 +46,21 @@ extern int yydebug;
   enum yytokentype
   {
     NUMINT = 258,
-    NUMFLT = 259,
-    IDENTIFIER = 260,
-    PARAMETRO = 261,
-    CARREGA = 262,
-    TREINAMENTO = 263,
-    PREDICAO = 264,
-    RESULTADO = 265,
-    ACURACIA = 266,
-    DIVISAO = 267,
-    ESCALONAR = 268,
-    TRANSFORMAR = 269,
-    ASSGNOP = 270,
-    FALTANTES = 271,
-    CLASSIFICADOR = 272
+    IDENTIFIER = 259,
+    CARREGA = 260,
+    TREINAMENTO = 261,
+    PREDICAO = 262,
+    RESULTADO = 263,
+    FALTANTES = 264,
+    DIVISAO = 265,
+    ESCALONAR = 266,
+    TRANSFORMAR = 267,
+    CLASSIFICADOR = 268,
+    REGRESSOR = 269,
+    ACURACIA = 270,
+    F1 = 271,
+    MSE = 272,
+    R2 = 273
   };
 #endif
 
@@ -68,11 +69,10 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 29 "parser.y" /* yacc.c:1909  */
+#line 82 "parser.y" /* yacc.c:1909  */
 
 	char * ystr;
 	int   yint;// 1
-	float yflt;
 
 #line 78 "parser.tab.h" /* yacc.c:1909  */
 };

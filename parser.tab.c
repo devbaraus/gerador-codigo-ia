@@ -68,6 +68,8 @@
 #include <ctype.h>
 #include "sym.h"
 #include <time.h>
+#include <stdlib.h>
+#include <string.h>
 extern int yylineno;
 extern int global_scope;
 extern VAR *SymTab;
@@ -84,94 +86,18 @@ FILE * output;
 #define IMPORTDIVISAO      333333
 #define IMPORTSVC          444444
 #define IMPORTRFC          424242 //Random Forest Classifier
+#define IMPORTKNNC         123456 //KNN Classifier
+#define IMPORTACCURACY     324324
+#define IMPORTF1           666666
+#define IMPORTLINEAR       616161
+#define IMPORTPOLINOMIAL   626262
+#define IMPORTRFR          636363
+#define IMPORTSVR          646464
+#define IMPORTMSE          656565
+#define IMPORTR2		   676767
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
-
-#line 92 "parser.tab.c" /* yacc.c:339  */
-
-# ifndef YY_NULLPTR
-#  if defined __cplusplus && 201103L <= __cplusplus
-#   define YY_NULLPTR nullptr
-#  else
-#   define YY_NULLPTR 0
-#  endif
-# endif
-
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 1
-#endif
-
-/* In a future release of Bison, this section will be replaced
-   by #include "parser.tab.h".  */
-#ifndef YY_YY_PARSER_TAB_H_INCLUDED
-# define YY_YY_PARSER_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token type.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-  enum yytokentype
-  {
-    NUMINT = 258,
-    NUMFLT = 259,
-    IDENTIFIER = 260,
-    PARAMETRO = 261,
-    CARREGA = 262,
-    TREINAMENTO = 263,
-    PREDICAO = 264,
-    RESULTADO = 265,
-    ACURACIA = 266,
-    DIVISAO = 267,
-    ESCALONAR = 268,
-    TRANSFORMAR = 269,
-    ASSGNOP = 270,
-    FALTANTES = 271,
-    CLASSIFICADOR = 272
-  };
-#endif
-
-/* Value type.  */
-#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
-union YYSTYPE
-{
-#line 29 "parser.y" /* yacc.c:355  */
-
-	char * ystr;
-	int   yint;// 1
-	float yflt;
-
-#line 156 "parser.tab.c" /* yacc.c:355  */
-};
-
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
-# define YYSTYPE_IS_DECLARED 1
-#endif
-
-
-extern YYSTYPE yylval;
-
-int yyparse (void);
-
-#endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
-
-/* Copy the second part of user declarations.  */
-#line 35 "parser.y" /* yacc.c:358  */
-
-#include <stdlib.h>
-#include <string.h>
 
 struct node {
     int data;
@@ -202,16 +128,6 @@ void addImport(struct node **head, int val) {
     }
 }
 
-void printList(struct node *head) {
-    struct node *temp = head;
-    //iterate the entire linked list and print the data
-    while(temp != NULL) {
-        printf("%d->", temp->data);
-        temp = temp->next;
-    }
-    printf("NULL\n");
-}
-
 int encontreImport(struct node *head, int key) {
     struct node *temp = head;
     //iterate the entire linked list and print the data
@@ -225,21 +141,88 @@ int encontreImport(struct node *head, int key) {
     return -1;
 }
 
-char* pegarLetras(char line[]){
-   int i, j;
-   for (i = 0, j; line[i] != '\0'; ++i) {
-      while (!(line[i] >= 'a' && line[i] <= 'z') && !(line[i] >= 'A' && line[i] <= 'Z') && !(line[i] == '\0')) {
-         for (j = i; line[j] != '\0'; ++j) {
-            line[j] = line[j + 1];
-         }
-         line[j] = '\0';
-      }
-   }
-   return line;	
-}
+#line 145 "parser.tab.c" /* yacc.c:339  */
+
+# ifndef YY_NULLPTR
+#  if defined __cplusplus && 201103L <= __cplusplus
+#   define YY_NULLPTR nullptr
+#  else
+#   define YY_NULLPTR 0
+#  endif
+# endif
+
+/* Enabling verbose error messages.  */
+#ifdef YYERROR_VERBOSE
+# undef YYERROR_VERBOSE
+# define YYERROR_VERBOSE 1
+#else
+# define YYERROR_VERBOSE 0
+#endif
+
+/* In a future release of Bison, this section will be replaced
+   by #include "parser.tab.h".  */
+#ifndef YY_YY_PARSER_TAB_H_INCLUDED
+# define YY_YY_PARSER_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token type.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    NUMINT = 258,
+    IDENTIFIER = 259,
+    CARREGA = 260,
+    TREINAMENTO = 261,
+    PREDICAO = 262,
+    RESULTADO = 263,
+    FALTANTES = 264,
+    DIVISAO = 265,
+    ESCALONAR = 266,
+    TRANSFORMAR = 267,
+    CLASSIFICADOR = 268,
+    REGRESSOR = 269,
+    ACURACIA = 270,
+    F1 = 271,
+    MSE = 272,
+    R2 = 273
+  };
+#endif
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+
+union YYSTYPE
+{
+#line 82 "parser.y" /* yacc.c:355  */
+
+	char * ystr;
+	int   yint;// 1
+
+#line 209 "parser.tab.c" /* yacc.c:355  */
+};
+
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
 
 
-#line 243 "parser.tab.c" /* yacc.c:358  */
+extern YYSTYPE yylval;
+
+int yyparse (void);
+
+#endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
+
+/* Copy the second part of user declarations.  */
+
+#line 226 "parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -481,21 +464,21 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   36
+#define YYLAST   39
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  29
+#define YYNTOKENS  28
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  17
+#define YYNNTS  15
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  34
+#define YYNRULES  32
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  54
+#define YYNSTATES  55
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   272
+#define YYMAXUTOK   273
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -508,12 +491,12 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      27,    28,    23,    22,     2,    21,     2,    24,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    26,
-      19,    20,    18,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,    24,    23,     2,    22,     2,    25,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    27,
+      20,    21,    19,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,    25,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    26,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -531,32 +514,32 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17
+      15,    16,    17,    18
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   122,   122,   122,   137,   138,   140,   146,   155,   140,
-     173,   173,   223,   239,   266,   281,   281,   282,   285,   288,
-     289,   289,   297,   321,   326,   327,   328,   329,   336,   336,
-     336,   337,   348,   349,   350
+       0,   101,   101,   101,   116,   116,   118,   124,   133,   118,
+     151,   151,   201,   217,   243,   258,   258,   259,   259,   260,
+     268,   274,   277,   374,   384,   394,   404,   416,   416,   416,
+     418,   418,   418
 };
 #endif
 
-#if YYDEBUG || YYERROR_VERBOSE || 1
+#if YYDEBUG || YYERROR_VERBOSE || 0
 /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "NUMINT", "NUMFLT", "IDENTIFIER",
-  "PARAMETRO", "CARREGA", "TREINAMENTO", "PREDICAO", "RESULTADO",
-  "ACURACIA", "DIVISAO", "ESCALONAR", "TRANSFORMAR", "ASSGNOP",
-  "FALTANTES", "CLASSIFICADOR", "'>'", "'<'", "'='", "'-'", "'+'", "'*'",
-  "'/'", "'^'", "';'", "'('", "')'", "$accept", "program", "$@1",
-  "commands", "command", "$@2", "$@3", "$@4", "$@5", "$@6", "$@7",
-  "modelo", "resultados", "exp", "$@8", "$@9", "param", YY_NULLPTR
+  "$end", "error", "$undefined", "NUMINT", "IDENTIFIER", "CARREGA",
+  "TREINAMENTO", "PREDICAO", "RESULTADO", "FALTANTES", "DIVISAO",
+  "ESCALONAR", "TRANSFORMAR", "CLASSIFICADOR", "REGRESSOR", "ACURACIA",
+  "F1", "MSE", "R2", "'>'", "'<'", "'='", "'-'", "'+'", "'*'", "'/'",
+  "'^'", "';'", "$accept", "program", "$@1", "commands", "command", "$@2",
+  "$@3", "$@4", "$@5", "$@6", "$@7", "modelo", "resultados", "exp",
+  "param", YY_NULLPTR
 };
 #endif
 
@@ -566,15 +549,15 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,    62,    60,
-      61,    45,    43,    42,    47,    94,    59,    40,    41
+     265,   266,   267,   268,   269,   270,   271,   272,   273,    62,
+      60,    61,    45,    43,    42,    47,    94,    59
 };
 # endif
 
-#define YYPACT_NINF -27
+#define YYPACT_NINF -37
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-27)))
+  (!!((Yystate) == (-37)))
 
 #define YYTABLE_NINF -1
 
@@ -585,12 +568,12 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -27,     5,     2,   -27,    -2,   -27,   -27,   -27,     9,    16,
-      17,    21,   -27,   -27,   -27,     1,   -27,    23,   -27,   -27,
-      26,   -27,    25,    27,    28,     2,    -3,   -27,   -27,   -27,
-      -3,    29,   -27,   -27,   -27,   -27,   -27,   -27,   -27,   -27,
-      30,   -27,     3,    -3,   -27,   -27,   -27,   -27,     8,    -3,
-     -27,    -3,   -27,   -27
+     -37,    10,    -5,   -37,   -37,    12,    18,    19,   -37,    20,
+      21,    22,   -37,   -37,   -37,     0,    24,    25,    26,    -4,
+     -37,    27,    29,   -37,    30,    31,    31,    -5,   -37,   -37,
+     -37,   -37,   -37,   -37,   -37,    15,   -37,   -37,    32,   -37,
+     -37,   -37,    33,   -37,   -37,   -37,    17,   -37,   -37,   -37,
+      17,    15,   -37,    15,   -37
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -598,26 +581,26 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       2,     0,     4,     1,     0,     6,    17,    18,     0,     0,
-       0,     0,    10,    15,     3,     0,    20,     0,    23,    19,
-       0,    12,     0,     0,     0,     4,    24,     7,    14,    13,
-      24,     0,    16,     5,    25,    26,    27,    31,    28,    21,
-       0,    11,    32,    24,     8,    33,    34,    22,     0,    24,
-      29,    24,    30,     9
+       2,     0,     5,     1,     6,     0,     0,     0,    10,     0,
+       0,     0,    15,    17,     3,     0,     0,     0,     0,     0,
+      21,     0,     0,    12,     0,     0,     0,     5,     7,    19,
+      20,    23,    24,    25,    26,    29,    14,    13,     0,    16,
+      18,     4,     0,    27,    28,    11,    32,     8,    30,    31,
+      32,    29,    22,    29,     9
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -27,   -27,   -27,     6,   -27,   -27,   -27,   -27,   -27,   -27,
-     -27,   -27,   -27,   -26,   -27,   -27,   -27
+     -37,   -37,   -37,     6,   -37,   -37,   -37,   -37,   -37,   -37,
+     -37,    13,   -37,   -36,   -12
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     2,    14,    15,    17,    40,    49,    23,    24,
-      26,    32,    19,    39,    43,    52,    47
+      -1,     1,     2,    14,    15,    16,    42,    51,    21,    25,
+      26,    39,    20,    45,    50
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -625,48 +608,48 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      34,    35,    36,    37,    41,     3,    45,     4,    46,     5,
-       6,     7,     8,    16,     9,    10,    11,    48,    12,    13,
-      18,    20,    21,    51,    38,    53,    22,    25,    27,    28,
-      29,    33,    30,    31,    42,    44,    50
+       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+       3,    31,    32,    33,    34,    53,    17,    54,    43,    44,
+      48,    49,    18,    19,    22,    23,    24,    27,    28,    29,
+      30,    35,    36,    41,    37,    38,    46,    47,    52,    40
 };
 
 static const yytype_uint8 yycheck[] =
 {
-       3,     4,     5,     6,    30,     0,     3,     5,     5,     7,
-       8,     9,    10,    15,    12,    13,    14,    43,    16,    17,
-      11,     5,     5,    49,    27,    51,     5,    26,     5,     3,
-       5,    25,     5,     5,     5,     5,    28
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+       0,    15,    16,    17,    18,    51,     4,    53,     3,     4,
+       3,     4,     4,     4,     4,     4,     4,    27,     4,     4,
+       4,     4,     3,    27,     4,     4,     4,     4,    50,    26
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    30,    31,     0,     5,     7,     8,     9,    10,    12,
-      13,    14,    16,    17,    32,    33,    15,    34,    11,    41,
-       5,     5,     5,    37,    38,    26,    39,     5,     3,     5,
-       5,     5,    40,    32,     3,     4,     5,     6,    27,    42,
-      35,    42,     5,    43,     5,     3,     5,    45,    42,    36,
-      28,    42,    44,    42
+       0,    29,    30,     0,     5,     6,     7,     8,     9,    10,
+      11,    12,    13,    14,    31,    32,    33,     4,     4,     4,
+      40,    36,     4,     4,     4,    37,    38,    27,     4,     4,
+       4,    15,    16,    17,    18,     4,     3,     4,     4,    39,
+      39,    31,    34,     3,     4,    41,     4,     4,     3,     4,
+      42,    35,    42,    41,    41
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    29,    31,    30,    32,    32,    34,    35,    36,    33,
-      37,    33,    33,    33,    33,    38,    33,    33,    33,    33,
-      39,    33,    40,    41,    42,    42,    42,    42,    43,    44,
-      42,    42,    45,    45,    45
+       0,    28,    30,    29,    31,    31,    33,    34,    35,    32,
+      36,    32,    32,    32,    32,    37,    32,    38,    32,    32,
+      32,    32,    39,    40,    40,    40,    40,    41,    41,    41,
+      42,    42,    42
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     0,     2,     0,     3,     0,     0,     0,     8,
-       0,     4,     2,     3,     3,     0,     3,     1,     1,     2,
-       0,     4,     3,     1,     0,     1,     1,     1,     0,     0,
-       5,     1,     0,     1,     1
+       0,     2,     0,     2,     3,     0,     0,     0,     0,     8,
+       0,     4,     2,     3,     3,     0,     3,     0,     3,     3,
+       3,     2,     4,     2,     2,     2,     2,     1,     1,     0,
+       1,     1,     0
 };
 
 
@@ -1343,7 +1326,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 122 "parser.y" /* yacc.c:1646  */
+#line 101 "parser.y" /* yacc.c:1646  */
     { 
 	time_t t = time(NULL);
     struct tm tm = *localtime(&t);
@@ -1357,22 +1340,22 @@ yyreduce:
 	fprintf(output, "Github: https://github.com/Samanosukeh\n");
 	fprintf(output,"Site:   www.samanosuke.com.br\n\"\"\"\n\n");
 }
-#line 1361 "parser.tab.c" /* yacc.c:1646  */
+#line 1344 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 140 "parser.y" /* yacc.c:1646  */
+#line 118 "parser.y" /* yacc.c:1646  */
     {//verifica se ja add o import no código
 	if(encontreImport(head, IMPORTDATABASE) == -1){
 		addImport(&head, IMPORTDATABASE);
 		fprintf(output, "import pandas as pd\n");
 	}
   }
-#line 1372 "parser.tab.c" /* yacc.c:1646  */
+#line 1355 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 146 "parser.y" /* yacc.c:1646  */
+#line 124 "parser.y" /* yacc.c:1646  */
     {
 	VAR *p=FindVAR((yyvsp[0].ystr));
 	if(p==NULL){//verifica se a base ainda não foi adicionada
@@ -1382,20 +1365,20 @@ yyreduce:
 		printf("base de dados ja foi carregada");
 	}
   }
-#line 1386 "parser.tab.c" /* yacc.c:1646  */
+#line 1369 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 155 "parser.y" /* yacc.c:1646  */
+#line 133 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "#-----------Carregando base de dados-----------#\n");
-	fprintf(output, "%s = pd.read_csv('%s.csv')\n\n", (yyvsp[-2].ystr), (yyvsp[0].ystr));//pegando o nome da base.csv
+	fprintf(output, "%s = pd.read_csv('datasets/%s.csv')\n", (yyvsp[-2].ystr), (yyvsp[0].ystr));//pegando o nome da base.csv
   }
-#line 1395 "parser.tab.c" /* yacc.c:1646  */
+#line 1378 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 159 "parser.y" /* yacc.c:1646  */
+#line 137 "parser.y" /* yacc.c:1646  */
     {//se passou previsores por parâmetro ou não :)
 	   VAR *p=FindVAR((yyvsp[-5].ystr));/*buscando o nome da variável que guardou a base para concatenar com o nome das
 							variáveis que serão geradas no python*/
@@ -1406,15 +1389,15 @@ yyreduce:
 		   fprintf(output, "inicio_previsores_%s = %d\n", p->name, (yyvsp[0].yint));
 	   }
 
-	   fprintf(output, "coluna_classe_%s = %d\n\n", p->name, (yyvsp[-1].yint));
+	   fprintf(output, "coluna_classe_%s = %d\n", p->name, (yyvsp[-1].yint));
 	   fprintf(output, "previsores_%s = %s.iloc[:, inicio_previsores_%s:coluna_classe_%s].values\n", p->name, p->name, p->name, p->name);
 	   fprintf(output, "classe_%s = %s.iloc[:, coluna_classe_%s].values\n\n\n",p->name, p->name, p->name);
  }
-#line 1414 "parser.tab.c" /* yacc.c:1646  */
+#line 1397 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 173 "parser.y" /* yacc.c:1646  */
+#line 151 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "#-------- Tratando os valores faltantes -----------#\n");
 	if(encontreImport(head, IMPORTIMPUTER) == -1){
@@ -1423,11 +1406,11 @@ yyreduce:
 		fprintf(output,"import numpy as np\n");
 	}
   }
-#line 1427 "parser.tab.c" /* yacc.c:1646  */
+#line 1410 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 181 "parser.y" /* yacc.c:1646  */
+#line 159 "parser.y" /* yacc.c:1646  */
     {
 	  VAR *p=FindVAR((yyvsp[-1].ystr));//checar se a base declarada existe...
 	  if(p!=NULL){//se passou qual é a estratégia
@@ -1470,11 +1453,11 @@ yyreduce:
 		  printf("Base de dados não existe");
 	  }
   }
-#line 1474 "parser.tab.c" /* yacc.c:1646  */
+#line 1457 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 223 "parser.y" /* yacc.c:1646  */
+#line 201 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "#----------Escalonando os atributos -----------#\n");
 	if(encontreImport(head, IMPORTSCALER) == -1){
@@ -1491,11 +1474,11 @@ yyreduce:
 	}
 	fprintf(output,"\n\n");
  }
-#line 1495 "parser.tab.c" /* yacc.c:1646  */
+#line 1478 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 239 "parser.y" /* yacc.c:1646  */
+#line 217 "parser.y" /* yacc.c:1646  */
     {
 	fprintf(output, "#----------Transformação categórica pra numérica -----------#\n");
 	if(encontreImport(head, IMPORTLABELENCODER) == -1){
@@ -1511,11 +1494,10 @@ yyreduce:
 		fprintf(output, "classe_%s = labelencorder.fit_transform(classe_%s)",(yyvsp[-1].ystr),(yyvsp[-1].ystr));
 	}
 	else if(teste2 == 0){//senão se for previsores..
-		fprintf(output, "previsores_%s[\n    # Escreva aqui as colunas que queira aplicar o label encoder\n", (yyvsp[-1].ystr));
-		fprintf(output, "    # em formato de lista ex: [1, 3, 6, 7]\n");
-		fprintf(output, "] = labelencorder.fit_transform(previsores_%s[\n",(yyvsp[-1].ystr));
-		fprintf(output, "    # Escreva aqui as colunas que queira aplicar o label encoder\n");
-		fprintf(output, "    # em formato de lista ex: [1, 3, 6, 7]\n])");
+		fprintf(output,"# copie a linha abaixo e cole quantas vezes for necessário, essa de baixo\n");
+		fprintf(output,"# está aplicando apenas a coluna 0, substitua ou aplique nas outras se\n");
+		fprintf(output,"# necessário.\n");
+		fprintf(output,"previsores_%s[:,0] = labelencorder.fit_transform(previsores_%s[:,0])", (yyvsp[-1].ystr),(yyvsp[-1].ystr));
 	}
 	else{//se não foi passado nem classe nem previsores...
 		printf("É necessário passar o conjunto que será aplicado o labelEncoder");
@@ -1523,11 +1505,11 @@ yyreduce:
 	fprintf(output,"\n\n");
 	
  }
-#line 1527 "parser.tab.c" /* yacc.c:1646  */
+#line 1509 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 266 "parser.y" /* yacc.c:1646  */
+#line 243 "parser.y" /* yacc.c:1646  */
     { 
 	fprintf(output, "\n#------------Dividindo a base de dados para Treinamento------------#\n");
 	if(encontreImport(head, IMPORTDIVISAO) == -1){
@@ -1543,153 +1525,225 @@ yyreduce:
 	);
 	fprintf(output, "    previsores_%s, classe_%s, test_size=porcentagem_divisao\n)\n\n",p->name, p->name);
  }
-#line 1547 "parser.tab.c" /* yacc.c:1646  */
+#line 1529 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 281 "parser.y" /* yacc.c:1646  */
+#line 258 "parser.y" /* yacc.c:1646  */
     { modelo = 0; }
-#line 1553 "parser.tab.c" /* yacc.c:1646  */
+#line 1535 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 282 "parser.y" /* yacc.c:1646  */
-    {
-	fprintf(output, "\n#---------- Treinando o modelo -----------#\nmodelo.fit(previsores_treinamento, classe_treinamento)\n");
-}
-#line 1561 "parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 18:
-#line 285 "parser.y" /* yacc.c:1646  */
-    {
-	fprintf(output, "\n#---------- Fazendo as predições -----------#\nprevisoes = modelo.predict(previsores_teste)\n");
-}
-#line 1569 "parser.tab.c" /* yacc.c:1646  */
+#line 259 "parser.y" /* yacc.c:1646  */
+    { modelo = 1; }
+#line 1541 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 288 "parser.y" /* yacc.c:1646  */
-    {}
-#line 1575 "parser.tab.c" /* yacc.c:1646  */
+#line 260 "parser.y" /* yacc.c:1646  */
+    {
+	fprintf(output, "\n#---------- Treinando o modelo -----------#\n");
+	/* É preciso buscar para ver se o modelo foi instanciado
+	   É preciso buscar se a base foi instanciada */
+	VAR *modelo=FindVAR((yyvsp[-1].ystr));
+	VAR *base=FindVAR((yyvsp[0].ystr));
+	fprintf(output, "modelo_%s.fit(previsores_treinamento_%s, classe_treinamento_%s)\n",modelo->name, base->name, base->name);
+ }
+#line 1554 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 289 "parser.y" /* yacc.c:1646  */
-    { fprintf(output, "%s = ", (yyvsp[-1].ystr)); }
-#line 1581 "parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 289 "parser.y" /* yacc.c:1646  */
-    { 
-	VAR *p=FindVAR((yyvsp[-3].ystr));
-	ASSERT((p!=NULL),"Identificador Não declarado/");
-	ASSERT( (p->type == INT && (yyvsp[0].yint) == INT) || (p->type == FLT && ((yyvsp[0].yint) == INT || (yyvsp[0].yint) == FLT) ), " Tipo incompatível de dados");
-	fprintf(output, ";\n");
-}
-#line 1592 "parser.tab.c" /* yacc.c:1646  */
+#line 268 "parser.y" /* yacc.c:1646  */
+    {
+	fprintf(output, "\n#---------- Fazendo a predição -----------#\n");
+	VAR *modelo=FindVAR((yyvsp[-1].ystr));
+	VAR *base=FindVAR((yyvsp[0].ystr));
+	fprintf(output, "previsoes_%s = modelo_%s.predict(previsores_teste_%s)\n", base->name, modelo->name, base->name);
+ }
+#line 1565 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 297 "parser.y" /* yacc.c:1646  */
+#line 277 "parser.y" /* yacc.c:1646  */
     {
+	/*é preciso armazenar na tabela o nome da variável que 
+	guarda o modelo para que ela não seja mais usada*/
+	VAR *buscar = FindVAR((yyvsp[-3].ystr));
+	if (buscar == NULL){
+		AddVAR((yyvsp[-3].ystr),INT);
+	}
+
 	if(modelo == 0){ // se for um modelo de classificação...
-		if(strcmp((yyvsp[-1].ystr), "svm") == 0){// se o classificador for SVM...
+		if(strcmp((yyvsp[-2].ystr), "svm") == 0){// se o classificador for SVM...
 			fprintf(output, "#---------- SVM -----------#\n");
 			if(encontreImport(head, IMPORTSVC) == -1){//primeira vez importanto o SVC?
 				addImport(&head, IMPORTSVC);// add ele na tabela de símbolos
 				fprintf(output, "from sklearn.svm import SVC\n");
 			}
-			if ((yyvsp[0].yint) != NULL)
-				fprintf(output, "classificador_%s = SVC(kernel=\"%s\", random_state=0)\n\n",(yyvsp[-2].ystr), (yyvsp[0].yint));
+			if ((yyvsp[-1].yint) != NULL)
+				fprintf(output, "modelo_%s = SVC(kernel=\"%s\", random_state=0)\n\n",(yyvsp[-3].ystr), (yyvsp[-1].yint));
 			else
-				fprintf(output, "classificador_%s = SVC(random_state=0)\n\n",(yyvsp[-2].ystr));
+				fprintf(output, "modelo_%s = SVC(random_state=0)\n\n",(yyvsp[-3].ystr));
 		}
-		else if (strcmp((yyvsp[-1].ystr), "randomforest") == 0){
+		else if (strcmp((yyvsp[-2].ystr), "randomforest") == 0){ // se o classificador for random forest...
 			fprintf(output, "#---------- RandomForest -----------#\n");
 			if(encontreImport(head, IMPORTRFC) == -1){//primeira vez importanto o Random Forest?
 				addImport(&head, IMPORTRFC);// add ele na tabela de símbolos
 				fprintf(output, "from sklearn.ensemble import RandomForestClassifier\n");
 			}
-			fprintf(output, "classificador_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n",(yyvsp[-2].ystr), (yyvsp[0].yint));
+			fprintf(output, "modelo_%s = RandomForestClassifier(n_estimators=%d, random_state=0)\n\n",(yyvsp[-3].ystr), (yyvsp[-1].yint));
+		}
+		else if (strcmp((yyvsp[-2].ystr), "knn") == 0){ // se o classificador for KNN...
+			fprintf(output, "#---------- KNN -----------#\n");
+			if(encontreImport(head, IMPORTKNNC) == -1){//primeira vez importanto o KNN?
+				addImport(&head, IMPORTKNNC);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.neighbors import KNeighborsClassifier\n");
+			}
+			fprintf(output, "modelo_%s = KNeighborsClassifier(n_neighbors=%d, metric='minkowski', p=2)\n",(yyvsp[-3].ystr), (yyvsp[-1].yint));
 		}
 	}
-}
-#line 1620 "parser.tab.c" /* yacc.c:1646  */
+	else if(modelo == 1){//se for regressor...
+		if(strcmp((yyvsp[-2].ystr), "linear") == 0){// se o regressor for SVM...
+			fprintf(output, "#---------- Regressão Linear -----------#\n");
+			if(encontreImport(head, IMPORTLINEAR) == -1){
+				addImport(&head, IMPORTLINEAR);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.linear_model import LinearRegression\n");
+			}
+			fprintf(output, "modelo_%s = LinearRegression()\n\n",(yyvsp[-3].ystr));
+		}
+		else if(strcmp((yyvsp[-2].ystr), "polinomial") == 0){// se o classificador for SVM...
+			fprintf(output, "#---------- Regressão Polinomial -----------#\n");
+			if(encontreImport(head, IMPORTPOLINOMIAL) == -1){//primeira vez importanto o SVC?
+				addImport(&head, IMPORTPOLINOMIAL);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.preprocessing import PolynomialFeatures\n");
+			}
+
+			if ((yyvsp[-1].yint) != NULL){//passou a quantidade do polinômio?
+				fprintf(output, "poly = PolynomialFeatures(degree = %d)\n", (yyvsp[-1].yint));
+				if((yyvsp[0].yint) != NULL){
+					VAR *base=FindVAR((yyvsp[0].yint));
+					fprintf(output, "previsores_%s = poly.fit_transform(previsores_%s)\n", base->name, base->name);
+					/* Antes de instanciar o regressor linear, verificar se ja foi importado do SKLEARN*/
+					if(encontreImport(head, IMPORTLINEAR) == -1){
+						addImport(&head, IMPORTLINEAR);// add ele na tabela de símbolos
+						fprintf(output, "from sklearn.linear_model import LinearRegression\n");
+					}
+					fprintf(output, "modelo_%s = LinearRegression()\n\n",(yyvsp[-3].ystr));
+					
+				}
+			}
+			else{
+				printf("\n~> É necessário informar o grau do polinômio na regressão polinomial <~\n");
+			}
+		}
+		else if (strcmp((yyvsp[-2].ystr), "randomforest") == 0){
+			fprintf(output, "#---------- Regressor RandomForest -----------#\n");
+			if(encontreImport(head, IMPORTRFR) == -1){//primeira vez importanto o Regressor Random Forest?
+				addImport(&head, IMPORTRFR);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.ensemble import RandomForestRegressor\n");
+			}
+			if ((yyvsp[-1].yint) != NULL)//se passou a quantidade de arvores...
+				fprintf(output, "modelo_%s = RandomForestRegressor(n_estimators=%d, random_state=0)\n\n",(yyvsp[-3].ystr), (yyvsp[-1].yint));
+			else          //se não passou, deixar a quantidade padrão do RFR
+				fprintf(output, "modelo_%s = RandomForestRegressor(random_state=0)\n\n",(yyvsp[-3].ystr));
+		}
+		else if(strcmp((yyvsp[-2].ystr), "svm") == 0){// se o classificador for SVM...
+			fprintf(output, "#---------- Regressor SVM -----------#\n");
+			if(encontreImport(head, IMPORTSVR) == -1){//primeira vez importanto o SVC?
+				addImport(&head, IMPORTSVR);// add ele na tabela de símbolos
+				fprintf(output, "from sklearn.svm import SVR\n");
+			}
+			if ((yyvsp[-1].yint) != NULL)
+				fprintf(output, "modelo_%s = SVR(kernel=\"%s\")\n\n",(yyvsp[-3].ystr), (yyvsp[-1].yint));
+			else
+				fprintf(output, "modelo_%s = SVR()\n\n",(yyvsp[-3].ystr));
+		}
+	}
+ }
+#line 1665 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 321 "parser.y" /* yacc.c:1646  */
+#line 374 "parser.y" /* yacc.c:1646  */
     {
-	fprintf(output, "\n#---------- Checando a pricisão ----------#\nfrom sklearn.metrics import accuracy_score\nprecisao = accuracy_score(classe_teste, previsoes)\n");
-}
-#line 1628 "parser.tab.c" /* yacc.c:1646  */
+	fprintf(output, "\n#---------- Checando a precisão ----------#\n");
+	if(encontreImport(head, IMPORTACCURACY) == -1){
+		addImport(&head, IMPORTACCURACY);
+		fprintf(output, "from sklearn.metrics import accuracy_score\n");
+	}
+	/* Checar se o classificador existe e foi instanciado */
+	VAR *p=FindVAR((yyvsp[-1].ystr));
+	fprintf(output, "precisao_%s = accuracy_score(classe_teste_%s, previsoes_%s)\n", p->name, p->name, p->name);
+ }
+#line 1680 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 326 "parser.y" /* yacc.c:1646  */
-    { (yyval.yint)=UNDECL; }
-#line 1634 "parser.tab.c" /* yacc.c:1646  */
+#line 384 "parser.y" /* yacc.c:1646  */
+    {
+	fprintf(output, "\n#---------- Checando a F1-Score ----------#\n");
+	if(encontreImport(head, IMPORTF1) == -1){
+		addImport(&head, IMPORTF1);
+		fprintf(output, "from sklearn.metrics import f1_score\n");
+	}
+	/* Checar se o classificador existe e foi instanciado */
+	VAR *p=FindVAR((yyvsp[-1].ystr));
+	fprintf(output, "precisao_f1_%s = f1_score(classe_teste_%s, previsoes_%s, average='macro')\n\n", p->name, p->name, p->name);
+ }
+#line 1695 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 327 "parser.y" /* yacc.c:1646  */
-    {  }
-#line 1640 "parser.tab.c" /* yacc.c:1646  */
+#line 394 "parser.y" /* yacc.c:1646  */
+    {
+	fprintf(output, "\n#---------- Checando o MSE ----------#\n");
+	if(encontreImport(head, IMPORTMSE) == -1){
+		addImport(&head, IMPORTMSE);
+		fprintf(output, "from sklearn.metrics import mean_squared_error\n");
+	}
+	/* Checar se o regressor existe e foi instanciado */
+	VAR *p=FindVAR((yyvsp[-1].ystr));
+	fprintf(output, "mse_%s = mean_squared_error(classe_teste_%s, previsoes_%s)\n\n", p->name, p->name, p->name);
+ }
+#line 1710 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 328 "parser.y" /* yacc.c:1646  */
-    { (yyval.yint)= FLT; fprintf(output, "%f", (yyvsp[0].yflt));}
-#line 1646 "parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 329 "parser.y" /* yacc.c:1646  */
-    {// a única coisa guardada na tabela de simbolos
-	//VAR *p=FindVAR($1);
-	AddVAR((yyvsp[0].ystr), STR);
-	//ASSERT((p!=NULL),"Identificador Não declarado");
-	//$$= (p!=NULL)? p->type:UNDECL;
-	//fprintf(output, "%s", $1);
-}
-#line 1658 "parser.tab.c" /* yacc.c:1646  */
+#line 404 "parser.y" /* yacc.c:1646  */
+    {
+	fprintf(output, "\n#---------- Checando o Score R2 ----------#\n");
+	if(encontreImport(head, IMPORTR2) == -1){
+		addImport(&head, IMPORTR2);
+		fprintf(output, "from sklearn.metrics import r2_score\n");
+	}
+	/* Checar se o regressor existe e foi instanciado */
+	VAR *p=FindVAR((yyvsp[-1].ystr));
+	fprintf(output, "r2_%s = r2_score(classe_teste_%s, previsoes_%s)\n\n", p->name, p->name, p->name);
+ }
+#line 1725 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 336 "parser.y" /* yacc.c:1646  */
-    {fprintf(output,"(");}
-#line 1664 "parser.tab.c" /* yacc.c:1646  */
+#line 416 "parser.y" /* yacc.c:1646  */
+    { AddVAR((yyvsp[0].ystr), STR); }
+#line 1731 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 336 "parser.y" /* yacc.c:1646  */
-    {fprintf(output,")");}
-#line 1670 "parser.tab.c" /* yacc.c:1646  */
+#line 416 "parser.y" /* yacc.c:1646  */
+    { (yyval.yint)=UNDECL; }
+#line 1737 "parser.tab.c" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 336 "parser.y" /* yacc.c:1646  */
-    { (yyval.yint)= (yyvsp[-2].yint);}
-#line 1676 "parser.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 31:
-#line 337 "parser.y" /* yacc.c:1646  */
-    {
-	AddVAR((yyvsp[0].ystr), INT);
-	VAR *p=FindVAR((yyvsp[0].ystr));
-	char comando[50];//usado para guardar o comando sem modificar a string original
-	strcpy(comando, p->name);
-	pegarLetras(comando);
-	printf("- %s -", comando);
-}
-#line 1689 "parser.tab.c" /* yacc.c:1646  */
+  case 32:
+#line 418 "parser.y" /* yacc.c:1646  */
+    { (yyval.yint)=NULL; }
+#line 1743 "parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1693 "parser.tab.c" /* yacc.c:1646  */
+#line 1747 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1917,13 +1971,13 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 352 "parser.y" /* yacc.c:1906  */
+#line 419 "parser.y" /* yacc.c:1906  */
 
 
 main( int argc, char *argv[] ) {
 	output = fopen("output.py","w");
 	init_stringpool(10000); //memória que vai guardar as strings
-	if ( yyparse () == 0) printf("codigo sem erros");
+	if ( yyparse () == 0) printf("\ncodigo sem erros");
 }
 
 yyerror(char *s) { /* Called by yyparse on error */
