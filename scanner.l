@@ -9,7 +9,6 @@ ID       [_a-zA-Z][_A-Za-z0-9]*
 
 %%
 
-":="     { printf("Atribuição "); return(ASSGNOP);  }
 {DIGIT}+ { printf("Inteiro "); yylval.yint = atoi(yytext);  return(NUMINT);   }
 [-+]?{DIGIT}*"."{DIGIT}+ { printf("Real "); yylval.yflt = atof(yytext); return(NUMFLT);   }
 
@@ -23,7 +22,11 @@ predicao { printf("predição "); return(PREDICAO); }
 faltantes { printf("faltantes "); return(FALTANTES); }
 resultado { printf("resultado "); return(RESULTADO); }
 classificador { printf("classificador "); return(CLASSIFICADOR); }
+regressor     { printf("regressor ");     return(REGRESSOR); }
 acuracia { printf("acurácia "); return(ACURACIA); }
+mse { printf("mse "); return(MSE); }
+f1       { printf("f1-score "); return(F1); }
+r2       { printf("R2 "); return(R2); }
 {ID}     { printf("Identificador "); yylval.ystr = stringpool(yytext);  return(IDENTIFIER); }
 -{ID}={DIGIT}*?{ID}? { printf("parâmetro "); yylval.ystr = stringpool(yytext); return(PARAMETRO); }
 "\n"     { printf("\n");}
