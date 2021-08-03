@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include "sym.h"
 #include <time.h>
+#include <stdlib.h>
+#include <string.h>
 extern int yylineno;
 extern int global_scope;
 extern VAR *SymTab;
@@ -31,19 +33,6 @@ FILE * output;
 #define AddVAR(n,t) SymTab=MakeVAR(n,t,SymTab)
 #define ASSERT(x,y) if(!(x)) printf("%s na  linha %d\n",(y),yylineno)
 int modelo = 0; /* 0: classificação | 1: regressão */
-%}
-
-%define parse.error verbose //aparecer mais detalhes dos erros
-//docker run  -it  -v "%cd%":/usr/src  phdcoder/flexbison
-%union {
-	char * ystr;
-	int   yint;// 1
-	float yflt;
-}
-
-%{
-#include <stdlib.h>
-#include <string.h>
 
 struct node {
     int data;
@@ -74,16 +63,6 @@ void addImport(struct node **head, int val) {
     }
 }
 
-void printList(struct node *head) {
-    struct node *temp = head;
-    //iterate the entire linked list and print the data
-    while(temp != NULL) {
-        printf("%d->", temp->data);
-        temp = temp->next;
-    }
-    printf("NULL\n");
-}
-
 int encontreImport(struct node *head, int key) {
     struct node *temp = head;
     //iterate the entire linked list and print the data
@@ -96,27 +75,18 @@ int encontreImport(struct node *head, int key) {
     //key not found
     return -1;
 }
-
-char* pegarLetras(char line[]){
-   int i, j;
-   for (i = 0, j; line[i] != '\0'; ++i) {
-      while (!(line[i] >= 'a' && line[i] <= 'z') && !(line[i] >= 'A' && line[i] <= 'Z') && !(line[i] == '\0')) {
-         for (j = i; line[j] != '\0'; ++j) {
-            line[j] = line[j + 1];
-         }
-         line[j] = '\0';
-      }
-   }
-   return line;	
-}
-
 %}
 
+//%define parse.error verbose //aparecer mais detalhes dos erros
+//docker run  -it  -v "%cd%":/usr/src  phdcoder/flexbison
+%union {
+	char * ystr;
+	int   yint;// 1
+}
 
 %start program
 %token <yint> NUMINT
-%token <yflt> NUMFLT
-%token <ystr> IDENTIFIER PARAMETRO
+%token <ystr> IDENTIFIER
 %token CARREGA TREINAMENTO PREDICAO RESULTADO FALTANTES DIVISAO ESCALONAR TRANSFORMAR
 %token CLASSIFICADOR REGRESSOR ACURACIA F1 MSE R2
 %left '>' '<' '='
@@ -143,9 +113,8 @@ program : {
 } commands
 ;
 
-commands : /* empty */
-| command ';' /*{ fprintf(output, ";\n"); }*/ commands
-;
+commands : command ';' commands | /* ε */ ;
+
 command : CARREGA {//verifica se ja add o import no código
 	if(encontreImport(head, IMPORTDATABASE) == -1){
 		addImport(&head, IMPORTDATABASE);
@@ -163,7 +132,7 @@ command : CARREGA {//verifica se ja add o import no código
   }
   IDENTIFIER {
 	fprintf(output, "#-----------Carregando base de dados-----------#\n");
-	fprintf(output, "%s = pd.read_csv('%s.csv')\n\n", $3, $5);//pegando o nome da base.csv
+	fprintf(output, "%s = pd.read_csv('datasets/%s.csv')\n", $3, $5);//pegando o nome da base.csv
   }
   exp exp {//se passou previsores por parâmetro ou não :)
 	   VAR *p=FindVAR($3);/*buscando o nome da variável que guardou a base para concatenar com o nome das
@@ -175,7 +144,7 @@ command : CARREGA {//verifica se ja add o import no código
 		   fprintf(output, "inicio_previsores_%s = %d\n", p->name, $8);
 	   }
 
-	   fprintf(output, "coluna_classe_%s = %d\n\n", p->name, $7);
+	   fprintf(output, "coluna_classe_%s = %d\n", p->name, $7);
 	   fprintf(output, "previsores_%s = %s.iloc[:, inicio_previsores_%s:coluna_classe_%s].values\n", p->name, p->name, p->name, p->name);
 	   fprintf(output, "classe_%s = %s.iloc[:, coluna_classe_%s].values\n\n\n",p->name, p->name, p->name);
  }
@@ -260,11 +229,10 @@ command : CARREGA {//verifica se ja add o import no código
 		fprintf(output, "classe_%s = labelencorder.fit_transform(classe_%s)",$2,$2);
 	}
 	else if(teste2 == 0){//senão se for previsores..
-		fprintf(output, "previsores_%s[\n    # Escreva aqui as colunas que queira aplicar o label encoder\n", $2);
-		fprintf(output, "    # em formato de lista ex: [1, 3, 6, 7]\n");
-		fprintf(output, "] = labelencorder.fit_transform(previsores_%s[\n",$2);
-		fprintf(output, "    # Escreva aqui as colunas que queira aplicar o label encoder\n");
-		fprintf(output, "    # em formato de lista ex: [1, 3, 6, 7]\n])");
+		fprintf(output,"# copie a linha abaixo e cole quantas vezes for necessário, essa de baixo\n");
+		fprintf(output,"# está aplicando apenas a coluna 0, substitua ou aplique nas outras se\n");
+		fprintf(output,"# necessário.\n");
+		fprintf(output,"previsores_%s[:,0] = labelencorder.fit_transform(previsores_%s[:,0])", $2,$2);
 	}
 	else{//se não foi passado nem classe nem previsores...
 		printf("É necessário passar o conjunto que será aplicado o labelEncoder");
@@ -296,13 +264,13 @@ command : CARREGA {//verifica se ja add o import no código
 	VAR *modelo=FindVAR($2);
 	VAR *base=FindVAR($3);
 	fprintf(output, "modelo_%s.fit(previsores_treinamento_%s, classe_treinamento_%s)\n",modelo->name, base->name, base->name);
-}
+ }
 | PREDICAO IDENTIFIER IDENTIFIER{
 	fprintf(output, "\n#---------- Fazendo a predição -----------#\n");
 	VAR *modelo=FindVAR($2);
 	VAR *base=FindVAR($3);
 	fprintf(output, "previsoes_%s = modelo_%s.predict(previsores_teste_%s)\n", base->name, modelo->name, base->name);
-}
+ }
 | RESULTADO resultados
 ;
 
@@ -400,7 +368,8 @@ modelo: IDENTIFIER IDENTIFIER param param {
 				fprintf(output, "modelo_%s = SVR()\n\n",$1);
 		}
 	}
-}
+ }
+;
 
 resultados: IDENTIFIER ACURACIA {
 	fprintf(output, "\n#---------- Checando a precisão ----------#\n");
@@ -444,25 +413,9 @@ resultados: IDENTIFIER ACURACIA {
  }
 ;
 
-exp : /* ε */ { $$=UNDECL; }
-| NUMINT
-| NUMFLT 	  { $$= FLT; fprintf(output, "%f", $1);}
-| IDENTIFIER  {// a única coisa guardada na tabela de simbolos
-	AddVAR($1, STR);
- }
-| '(' {fprintf(output,"(");} exp ')' {fprintf(output,")");}  { $$= $3;}
-| PARAMETRO {
-	AddVAR($1, INT);
-	VAR *p=FindVAR($1);
-	char comando[50];//usado para guardar o comando sem modificar a string original
-	strcpy(comando, p->name);
-	//pegarLetras(comando);
-	printf("- %s -", comando);
- }
-;
+exp : NUMINT | IDENTIFIER { AddVAR($1, STR); } | /* ε */ { $$=UNDECL; } ;
 
-param: NUMINT | IDENTIFIER | /* ε */ { $$=NULL; }
-
+param: NUMINT | IDENTIFIER | /* ε */ { $$=NULL; } ;
 %%
 
 main( int argc, char *argv[] ) {
