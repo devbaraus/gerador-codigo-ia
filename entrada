@@ -1,22 +1,33 @@
-carrega base1 credit_data 4;
-carrega base2 risc_credit 9 1;
-faltantes base2 media;
-escalonar base1;
-transformar base1 classe;
+carrega base1 credit_data 4 1;
+carrega base2 census 10;
+
+faltantes base1 media;
+
+transformar base2 classe;
+transformar base2 previsores;
+
+escalonar base2;
+
 divisao base1 25;
+divisao base2 25;
+
 classificador rf randomforest 40;
-classificador knn knn 5;
+classificador svm svm;
+
 treinamento rf base1;
+treinamento svm base2;
+
 predicao rf base1;
-treinamento knn base2;
-resultado base1 acuracia;
+predicao svm base2;
+
 resultado base1 f1;
+resultado base2 acuracia;
 
 carrega base3 plano_saude 1;
 divisao base3 25;
-regressor rp polinomial 2 base3;
 
 regressor rfr randomforest;
 treinamento rfr base3;
 
-regressor svr svm rbf;
+predicao rfr base3;
+resultado base3 mse;
