@@ -1,5 +1,10 @@
 # gerador-codigo-ia
 
+# Iniciando o container
+Com o docker rodando, rode o comando ```docker run  -it  -v "%cd%":/usr/src  phdcoder/flexbison``` no terminal, entre na pasta ```cd usr/src```
+
+Os dois arquivos importantes são: **entrada** que é arquivo onde os comandos serão inseridos e **output.py** onde sairá a tradução dos comandos gerado em código python.
+
 # Comandos
 
 - ## Carregar base de dados:  ```carrega base1 credit_data 7 1;```
@@ -46,6 +51,11 @@
          - **regressor**: para importar a versão de regressor do modelo
      -  **rf**: o nome da variável que guardará a instância do modelo
      -  **randomforest**: modelo de classificação/regressão utilizado
+         - **svm**: instanciar classificador ou regressor do SVM
+         - **randomforest**: instanciar classificador ou regressor do Random Forest
+         - **knn**: instanciar classificador do K-nearest neighbors
+         - **linear**: instanciar regressor linear
+         - **polinomial**: instanciar regressor polinomial
      -  **40**: nesse exemplo, quantidade de árvores utilizada no RandomForest, parâmetro opcional, outroas opções:
         - **‘linear’, ‘poly’ ou ‘rbf’**: parâmetro para o kernel do SVM, exemplo: ```classificador svc svm rbf;```
          - Um número como parâmetro pode ser também a quantidade de vizinhos no KNN, exemplo: ```classificador kn knn 5;```. o grau do polinômio na regressão: ```regressor rp polinomial 2 base3;``` PS: o regressor polinomial é o único que recebe um segundo parâmetro que é além do grau do polinômio que é o nome da base que é onde será aplicado a transformação dos dados para o grau do polinômio.
@@ -70,8 +80,9 @@
      -  **resultado**: chamada para realizar a checagem dos resultados
      -  **base1**: base de dados escolhida para verificar os resultados
      -  **acuracia**: tipo de resultado para checar a acurácia do modelo, outras opções de resultado:
-         - **classe**: aplicar no atributo classe
+         - **f1**: ao passar esse parâmetro o resultado obtido é da f1-score macro
+         - **mse**: ao passar esse parâmetro o resultado é o Mean Squared Error, usado apenas para regressão
+         - **r2**: ao passar esse parâmetro o resultado é o coeficiente de determinação - R2, usado apenas para regressão
 
 ----
 
-resultado base1 acuracia;
