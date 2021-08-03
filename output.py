@@ -1,6 +1,6 @@
 """
 Template gerado por Flauberth Duarte.
-Gerado em: 29-07-2021 11:40:07
+Gerado em: 29-07-2021 16:50:02
 #-------Encontre me em: -------------#
 Github: https://github.com/Samanosukeh
 Site:   www.samanosuke.com.br
@@ -71,6 +71,9 @@ modelo_rf.fit(previsores_treinamento_base1, classe_treinamento_base1)
 #---------- Fazendo a predição -----------#
 previsoes_base1 = modelo_rf.predict(previsores_teste_base1)
 
+#---------- Treinando o modelo -----------#
+modelo_knn.fit(previsores_treinamento_base2, classe_treinamento_base2)
+
 #---------- Checando a precisão ----------#
 from sklearn.metrics import accuracy_score
 precisao_base1 = accuracy_score(classe_teste_base1, previsoes_base1)
@@ -89,6 +92,13 @@ previsores_base3 = base3.iloc[:, inicio_previsores_base3:coluna_classe_base3].va
 classe_base3 = base3.iloc[:, coluna_classe_base3].values
 
 
+
+#------------Dividindo a base de dados para Treinamento------------#
+porcentagem_divisao = 0.25
+previsores_treinamento_base3, previsores_teste_base3, classe_treinamento_base3, classe_teste_base3 = train_test_split(
+    previsores_base3, classe_base3, test_size=porcentagem_divisao
+)
+
 #---------- Regressão Polinomial -----------#
 from sklearn.preprocessing import PolynomialFeatures
 poly = PolynomialFeatures(degree = 2)
@@ -99,4 +109,24 @@ modelo_rp = LinearRegression()
 #---------- Regressor RandomForest -----------#
 from sklearn.ensemble import RandomForestRegressor
 modelo_rfr = RandomForestRegressor(random_state=0)
+
+
+#---------- Treinando o modelo -----------#
+modelo_rfr.fit(previsores_treinamento_base3, classe_treinamento_base3)
+#---------- Regressor SVM -----------#
+from sklearn.svm import SVR
+modelo_svr = SVR(kernel="rbf")
+
+
+#---------- Fazendo a predição -----------#
+previsoes_base3 = modelo_rfr.predict(previsores_teste_base3)
+
+#---------- Checando o MSE ----------#
+from sklearn.metrics import mean_squared_error
+mse_base3 = mean_squared_error(classe_teste_base3, previsoes_base3)
+
+
+#---------- Checando o Score R2 ----------#
+from sklearn.metrics import r2_score
+r2_base3 = r2_score(classe_teste_base3, previsoes_base3)
 
